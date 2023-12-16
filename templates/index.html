@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+<script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+
+<!-- Create an element where the map will take place -->
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embedded SVG</title>
+</head>
+<body>
+    {% if patientId %}
+        <script>
+            var bodyPartData = {{ data | tojson }};
+            console.log(bodyPartData)
+            d3.xml("{{ url_for('static',filename='patient_avatars/avatar_patient_' + patientId + '.svg') }}").then(function(xml) {
+            // 'xml' is the parsed XML document
+
+            // Append the loaded SVG to the body (or any other DOM element)
+
+            // Add a click event listener to all circles
+
+            var tooltip = d3.select("body").append('div')
+            .attr('class', 'tooltip')
+            .style('opacity', 0).style('width', '500px') // Set the width of the tooltip
+            .style('height', '50px');
+            d3.select("body").node().appendChild(xml.documentElement);
+
+            pathElements = d3.selectAll("path");
+            pathElements.on("mouseover", function() {
+                var pathElement = d3.select(this);
+                var id = pathElement.attr('id');
+                if(id != null && (id[0] == "g" || id[0] == "p")){
+                    id = "brain"
+                    pathElement = d3.select("#parent")
+                }
+                var tooltipText = ""
+                var bodyPartScoreMap = bodyPartData[id][1]
+                tooltip.selectAll(".text")
+                    .data(bodyPartScoreMap)
+                    .enter().append("div")
+                    .attr("class", "tooltiptext").style('opacity',0.9)
+                    .html(d => `<h1>${d}</h1><p>${bodyPartScoreMap[d]}</p>`);
+
+                // Update the tooltip content and position
+                tooltip.transition()
+                .duration(200)
+                .style('opacity', 0.9)
+                .text(tooltipText);
+                pathElement.style('stroke','green').style('stroke-width','4px')
+
+
+            }).on("mouseout", function(d) {
+                var pathElement = d3.select(this);
+                tooltip.transition()
+                .duration(500)
+                .style('opacity', 0);
+                pathElement.style('stroke','grey').style('stroke-width','2px')
+            })
+            });
+        </script>
+    <!-- {% endif %}
+    {% if headRightSummary != "" %}
+        <h4>{{ headRightSummary }}</h4>
+    {% endif %}
+
+    {% if headLeftSummary != "" %}
+        <h4>  {{ headLeftSummary }}</h4>
+    {% endif %}
+
+    {% if legLeftSummary != "" %}
+        <h4>  {{ legLeftSummary }}</h4>
+    {% endif %}
+
+    {% if legRightSummary != "" %}
+        <h4> {{ legRightSummary }}</h4>
+    {% endif %}
+
+    {% if armLeftSummary != "" %}
+        <h4> {{ armLeftSummary }}</h4>
+    {% endif %}
+
+    {% if armRightSummary != "" %}
+        <h4> {{ armRightSummary }}</h4>
+    {% endif %} -->
+    </body>
+</html>
