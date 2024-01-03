@@ -36,7 +36,7 @@ def main():
                 execute(brainWalkData)
                 return render_template('index.html',patientId=patientId,data=brainWalkData.body_parts)
             break
-        return render_template('index.html',patientId=patientId)
+        return render_template('index.html',patientId=patientId,data={})
     
 if __name__ == '__main__':
     app.run(host="localhost", port=5000, debug=True)

@@ -17,14 +17,8 @@
     {% if patientId %}
         <script>
             var bodyPartData = {{ data | tojson }};
-            console.log(bodyPartData)
             d3.xml("{{ url_for('static',filename='patient_avatars/avatar_patient_' + patientId + '.svg') }}").then(function(xml) {
-            // 'xml' is the parsed XML document
-
-            // Append the loaded SVG to the body (or any other DOM element)
-
-            // Add a click event listener to all circles
-
+                
             var tooltip = d3.select("body").append('div')
             .attr('class', 'tooltip')
             .style('opacity', 0).style('width', '500px') // Set the width of the tooltip
@@ -64,29 +58,5 @@
             })
             });
         </script>
-    <!-- {% endif %}
-    {% if headRightSummary != "" %}
-        <h4>{{ headRightSummary }}</h4>
-    {% endif %}
-
-    {% if headLeftSummary != "" %}
-        <h4>  {{ headLeftSummary }}</h4>
-    {% endif %}
-
-    {% if legLeftSummary != "" %}
-        <h4>  {{ legLeftSummary }}</h4>
-    {% endif %}
-
-    {% if legRightSummary != "" %}
-        <h4> {{ legRightSummary }}</h4>
-    {% endif %}
-
-    {% if armLeftSummary != "" %}
-        <h4> {{ armLeftSummary }}</h4>
-    {% endif %}
-
-    {% if armRightSummary != "" %}
-        <h4> {{ armRightSummary }}</h4>
-    {% endif %} -->
     </body>
 </html>
