@@ -17,8 +17,14 @@
     {% if patientId %}
         <script>
             var bodyPartData = {{ data | tojson }};
+            console.log(bodyPartData)
             d3.xml("{{ url_for('static',filename='patient_avatars/avatar_patient_' + patientId + '.svg') }}").then(function(xml) {
-                
+            // 'xml' is the parsed XML document
+
+            // Append the loaded SVG to the body (or any other DOM element)
+
+            // Add a click event listener to all circles
+
             var tooltip = d3.select("body").append('div')
             .attr('class', 'tooltip')
             .style('opacity', 0).style('width', '500px') // Set the width of the tooltip
@@ -58,5 +64,6 @@
             })
             });
         </script>
+    <!-- {% endif %}
     </body>
 </html>
