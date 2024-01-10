@@ -53,6 +53,7 @@ class BrainWalkData:
         self.patient_id = row['DeID']
         self.labels = labels
         # dictionary of body part -> {shade_intensity, {field_map}}
+        ET.register_namespace("","http://www.w3.org/2000/svg")
         self.tree = ET.ElementTree(file=template_svg_path)
         self.body_parts = {}
         self.initializeBodyPartData(row)
@@ -61,14 +62,14 @@ class BrainWalkData:
         for element in self.tree.iter():
             id = element.get("id")
             if id in self.labels:
-                intensity = self.parseScores(id,row,element)
-                style = ShapeStyle({"fill": intensity})
-                element.set("style", str(style))
-                self.body_parts[id] = {}
+                scores = self.parseScoresAndSetColor(id,row,element)
+                self.body_parts[id] = scores
+        ET.register_namespace("","http://www.w3.org/2000/svg")
         final_path = os.path.join(os.getcwd(),'static','patient_avatars','avatar_patient.svg')
         self.tree.write(final_path)
   
-    def parseScores(self,name,row,element):
+    def parseScoresAndSetColor(self,name,row,element):
+        ET.register_namespace("","http://www.w3.org/2000/svg")
         fields = BODY_PART_TO_BRAINWALK_FIELDS[name] if name in BODY_PART_TO_BRAINWALK_FIELDS.keys() else []
         max_score = 0
         scores = {}
@@ -81,7 +82,9 @@ class BrainWalkData:
                 value = map[string_entry]/(len(map.keys())-1) if string_entry != "" else 0
                 max_score = max(max_score,value)
             scores[field] = string_entry
-        return self.intensity2color(max_score)
+        style = ShapeStyle({"fill": self.intensity2color(max_score)})
+        element.set("style", str(style))
+        return scores
 
     def intensity2color(self,scale):
         """Interpolate from pale green to pale pink
