@@ -17,20 +17,8 @@
     {% if patientId %}
         <script>
             var bodyPartData = {{ data | tojson }};
+            d3.xml("{{ url_for('static',filename='patient_avatars/avatar_patient.svg') }}").then(function(xml) {
             console.log(bodyPartData)
-            d3.xml("{{ url_for('static',filename='patient_avatars/avatar_patient_' + patientId + '.svg') }}").then(function(xml) {
-            // 'xml' is the parsed XML document
-
-            // Append the loaded SVG to the body (or any other DOM element)
-
-            // Add a click event listener to all circles
-
-            var tooltip = d3.select("body").append('div')
-            .attr('class', 'tooltip')
-            .style('opacity', 0).style('width', '500px') // Set the width of the tooltip
-            .style('height', '50px');
-            d3.select("body").node().appendChild(xml.documentElement);
-
             pathElements = d3.selectAll("path");
             pathElements.on("mouseover", function() {
                 var pathElement = d3.select(this);
@@ -41,17 +29,9 @@
                 }
                 var tooltipText = ""
                 var bodyPartScoreMap = bodyPartData[id][1]
-                tooltip.selectAll(".text")
-                    .data(bodyPartScoreMap)
-                    .enter().append("div")
-                    .attr("class", "tooltiptext").style('opacity',0.9)
-                    .html(d => `<h1>${d}</h1><p>${bodyPartScoreMap[d]}</p>`);
+                console.log(bodyPartScoreMap)
 
-                // Update the tooltip content and position
-                tooltip.transition()
-                .duration(200)
-                .style('opacity', 0.9)
-                .text(tooltipText);
+                pathElement.style('title',tooltipText)
                 pathElement.style('stroke','green').style('stroke-width','4px')
 
 
@@ -62,6 +42,7 @@
                 .style('opacity', 0);
                 pathElement.style('stroke','grey').style('stroke-width','2px')
             })
+            d3.select("body").node().appendChild(xml.documentElement);
             });
         </script>
     <!-- {% endif %}
