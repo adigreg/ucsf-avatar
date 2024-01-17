@@ -49,10 +49,8 @@ BRAINWALK_FIELD_STRING_TO_INT_SCORE = {"speak": {"I do not have problems speakin
 class BrainWalkData:
     def __init__(self, row,labels,template_svg_path):
         logging.basicConfig(level=logging.DEBUG)
-        # create map with body part to dictionary of symptoms
         self.patient_id = row['DeID']
         self.labels = labels
-        # dictionary of body part -> {shade_intensity, {field_map}}
         ET.register_namespace("","http://www.w3.org/2000/svg")
         self.tree = ET.ElementTree(file=template_svg_path)
         self.body_parts = {}
@@ -64,12 +62,10 @@ class BrainWalkData:
             if id in self.labels:
                 scores = self.parseScoresAndSetColor(id,row,element)
                 self.body_parts[id] = scores
-        ET.register_namespace("","http://www.w3.org/2000/svg")
         final_path = os.path.join(os.getcwd(),'static','patient_avatars','avatar_patient.svg')
         self.tree.write(final_path)
   
     def parseScoresAndSetColor(self,name,row,element):
-        ET.register_namespace("","http://www.w3.org/2000/svg")
         fields = BODY_PART_TO_BRAINWALK_FIELDS[name] if name in BODY_PART_TO_BRAINWALK_FIELDS.keys() else []
         max_score = 0
         scores = {}

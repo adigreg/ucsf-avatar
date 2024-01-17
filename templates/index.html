@@ -3,6 +3,7 @@
 
 <!-- Load d3.js -->
 <script src="https://d3js.org/d3.v5.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
 
@@ -15,37 +16,11 @@
 </head>
 <body>
     {% if patientId %}
-        <script>
-            var bodyPartData = {{ data | tojson }};
-            d3.xml("{{ url_for('static',filename='patient_avatars/avatar_patient.svg') }}").then(function(xml) {
-                var tooltip = d3.select("body").append('div')
-                    .attr('class', 'tooltip')
-                    .style('opacity', 0).style('width', '500px') // Set the width of the tooltip
-                    .style('height', '50px');
-            d3.select("body").node().appendChild(xml.documentElement);
-            pathElements = d3.selectAll("path");
-            pathElements.on("mouseover", function() {
-                var pathElement = d3.select(this);
-                var id = pathElement.attr('id');
-                if(id != null && (id[0] == "g" || id[0] == "p")){
-                    id = "brain"
-                    pathElement = d3.select("#parent")
-                }
-                var tooltipText = JSON.stringify(bodyPartData[id])
-                tooltip.transition()
-                .duration(200)
-                .style('opacity', 0.9)
-                .text(tooltipText);
-                pathElement.style('stroke','green').style('stroke-width','4px')
-            }).on("mouseout", function(d) {
-                var pathElement = d3.select(this);
-                tooltip.transition()
-                .duration(500)
-                .style('opacity', 0);
-                pathElement.style('stroke','grey').style('stroke-width','2px')
-            })
-            });
-        </script>
-    <!-- {% endif %}
+    <script>
+        var bodyPartData = {{ data | tojson }};
+        var avatarUrl = "{{ url_for('static', filename='patient_avatars/avatar_patient.svg') }}"
+    </script>
+        <script src="{{ url_for('static', filename='js/render_avatar.js') }}" ></script>
+    {% endif %}
     </body>
 </html>
