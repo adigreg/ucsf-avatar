@@ -1,22 +1,11 @@
 import logging
 from flask import Flask, request
-from flask import jsonify
 from flask import render_template
 from brainwalkrecord import BrainWalkData
-import matplotlib.pyplot as plt
 import os
 import csv
 import yaml
 import logging
-'''
-TODOs:
-1. Change RGB color scheme from blues to pale green to pale red
-2. Iterate through svg tree instead of yaml labels in brainwalkrecord
-3. Try to think about adding support for other types of metrics coming from brainwalk
-4. Formatting tooltip
-5. Rendering tooltip next to 
-6. Add date filtering
-'''
 
 app = Flask(__name__)
 
