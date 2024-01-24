@@ -115,18 +115,22 @@ class BrainWalkData:
         return scores, max_score
 
     def intensity2color(self,scale):
-        """Interpolate from pale green to pale pink
-
-        Boundaries:
-            min, 0.0: #cccccc = (204, 204, 204)
-            max, 1.0: #ff2000 = (255, 32, 0)
+        """
+        Map score to shades of blue (if score is zero, map to grey).
         """
         assert 0.0 <= scale <= 1.0
-        baseline = 204
-        max_rgb = (0, 32, 255)
-        new_rbg = tuple(baseline + int(round(scale * (component - baseline)))
-                        for component in max_rgb)
-        return "#%02x%02x%02x" % new_rbg
+        if scale == 0:
+            return "#cccccc"
+        elif scale <= 0.2:
+            return "#accbff"
+        elif scale <= 0.4:
+            return "#92bbff"
+        elif scale <= 0.6:
+            return "#78aaff"
+        elif scale <= 0.8:
+            return "#649eff"
+        else:
+            return "#4188ff"
 
 class ShapeStyle(object):
     base_styles = {
