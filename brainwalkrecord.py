@@ -108,7 +108,6 @@ class BrainWalkData:
         """Interpolate from pale green to pale pink
 
         Boundaries:
-
             min, 0.0: #cccccc = (204, 204, 204)
             max, 1.0: #ff2000 = (255, 32, 0)
         """

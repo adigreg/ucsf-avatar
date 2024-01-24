@@ -9,33 +9,19 @@ d3.xml(avatarUrl).then(function(xml) {
         .style("border", "1px solid #ccc");
     d3.select("body").node().appendChild(xml.documentElement);
     pathElements = d3.selectAll("path");
-    pathElements.on("mouseover", function(d) {
-            var pathElement = d3.select(this);
-            var id = pathElement.attr('id');
-            if(id != null && (id[0] == "g" || id[0] == "p")){
-                id = "brain"
-                pathElement = d3.select("#parent")
-            }
-            var formattedHtml = ""
-            for(var surveyValue in bodyPartData[id]){
-                formattedHtml += 
-                "<div><strong>" + surveyValue + "</strong>" + "</div>"
-                + "<div>" + bodyPartData[id][surveyValue] + "</div>";
-            }
-            if(formattedHtml == ""){
-                formattedHtml = "<div>No issues with " + id + "!</div>"
-            }
-            tooltip.html(formattedHtml)
-            .transition()
-            .style('opacity', 1)
-            .delay(0)
-            .style('position','absolute')
-            .style("left", (d3.event.offsetX + 10) + "px")
-            .style("top", (d3.event.offsetY + 10) + "px")
-            .style("display", "block");
-            pathElement.style('stroke','green').style('stroke-width','2px')
+    pathElements.on("mouseover", mouseMoveOrMouseOver);
+    pathElements.on("mousemove", mouseMoveOrMouseOver);
+    pathElements.on("mouseout", function(d) {
+        var pathElement = d3.select(this);
+        tooltip.transition()
+        .delay(0)
+        .style('position','absolute')
+        .style("left", (d3.event.offsetX + 30) + "px")
+        .style("top", (d3.event.offsetY + 10) + "px")
+        .style('opacity', 0);
+        pathElement.style('stroke','grey').style('stroke-width','2px');
     });
-    pathElements.on("mousemove", function(d) {
+    function mouseMoveOrMouseOver(d){
         var pathElement = d3.select(this);
         var id = pathElement.attr('id');
         if(id != null && (id[0] == "g" || id[0] == "p")){
@@ -56,18 +42,9 @@ d3.xml(avatarUrl).then(function(xml) {
         .style('opacity', 1)
         .delay(0)
         .style('position','absolute')
-        .style("left", (d3.event.offsetX + 10) + "px")
+        .style("left", (d3.event.offsetX + 30) + "px")
         .style("top", (d3.event.offsetY + 10) + "px")
         .style("display", "block");
-    });
-    pathElements.on("mouseout", function(d) {
-        var pathElement = d3.select(this);
-        tooltip.transition()
-        .delay(0)
-        .style('position','absolute')
-        .style("left", (d3.event.offsetX + 10) + "px")
-        .style("top", (d3.event.offsetY + 10) + "px")
-        .style('opacity', 0);
-        pathElement.style('stroke','grey').style('stroke-width','2px');
-    });
+        pathElement.style('stroke','green').style('stroke-width','2px');
+    }
 });
