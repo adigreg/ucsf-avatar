@@ -21,6 +21,8 @@
         var avatarUrl = "{{ url_for('static', filename='patient_avatars/avatar_patient.svg') }}"
     </script>
         <script src="{{ url_for('static', filename='js/render_avatar.js') }}" ></script>
+    {% else %}
+        <h1>No patient found. Please provide a valid patient ID.</h1>
     {% endif %}
     </body>
 </html>
