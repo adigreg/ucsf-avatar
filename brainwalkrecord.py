@@ -69,12 +69,24 @@ class BrainWalkData:
         for element in self.tree.iter():
             id = element.get("id")
             if id in self.labels:
-                scores = self.parseScoresAndSetColor(id,row,element)
+                scores, max_score = self.parseScores(id,row)
                 self.body_parts[id] = scores
+                style = ShapeStyle({"fill": self.intensity2color(max_score)})
+                if id == "brain":
+                    # recurse on elements
+                    self.recurseOnBrain(element,style)
+                element.set("style", str(style))   
         final_path = os.path.join(os.getcwd(),'static','patient_avatars','avatar_patient.svg')
         self.tree.write(final_path)
+
+    def recurseOnBrain(self,element,style):
+        if element == None:
+            return
+        for child in list(element):
+            child.set("style", str(style))
+            self.recurseOnBrain(child,style)
   
-    def parseScoresAndSetColor(self,name,row,element):
+    def parseScores(self,name,row):
         fields = BODY_PART_TO_BRAINWALK_FIELDS[name] if name in BODY_PART_TO_BRAINWALK_FIELDS.keys() else []
         max_score = 0
         scores = {}
@@ -100,9 +112,7 @@ class BrainWalkData:
             # Set values to display and set new max score for body part.
             scores[field] = string_entry
             max_score = max(max_score,value)
-        style = ShapeStyle({"fill": self.intensity2color(max_score)})
-        element.set("style", str(style))
-        return scores
+        return scores, max_score
 
     def intensity2color(self,scale):
         """Interpolate from pale green to pale pink

@@ -26,7 +26,6 @@ d3.xml(avatarUrl).then(function(xml) {
         var id = pathElement.attr('id');
         if(id != null && (id[0] == "g" || id[0] == "p")){
             id = "brain"
-            pathElement = d3.select("#parent")
         }
         var formattedHtml = ""
         for(var surveyValue in bodyPartData[id]){
