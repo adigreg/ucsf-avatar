@@ -9,12 +9,12 @@ BODY_PART_TO_BRAINWALK_FIELDS = {"arm_right":["right_arm","strength_rt_arm","spa
         "arm_left":["left_arm","strength_lt_arm","spasm_lt_arm","tremor_arms"],
         "leg_right":["right_leg","strength_rt_leg","spasm_rt_leg","tremor_legs"],
         "leg_left": ["left_leg","strength_lt_leg","spasm_lt_leg","tremor_legs"],
-        "eye_left": ["vision_lt"],
-        "eye_right":["vision_rt"],
+        "eye_left": ["vision_lt","blind_spots"],
+        "eye_right":["vision_rt","blind_spots"],
         "face_right":["rt_face","feeling_rt"],
         "face_left":["lt_face","feeling_lt"],
-        "abdomen":["bowel_bladder_score"],
-        "brain": ["cognition","fatigue"],
+        "abdomen":["bowel_bladder_max","bladder_urgency_change"],
+        "brain": ["cognition","fatigue","mfis_score","mfis_cognitive_score"],
         "mouth":["speak"],
         "neck":["swallow"],
         "ear_left":["hearing"],
@@ -44,7 +44,16 @@ BRAINWALK_FIELD_STRING_TO_INT_SCORE = {"speak": {"I do not have problems speakin
         "spasm_lt_arm": {"I do not have stiffness or spasms":0, "Mild, does not make it hard for me to use":1, "Moderate stiffness, but with effort I can use":2, "Sometimes I cannot overcome the stiffness to use my arm or leg":3, "My arm or leg is so contracted that I cannot use it at all":4},
         "spasm_rt_leg": {"I do not have stiffness or spasms":0, "Mild, does not make it hard for me to use":1, "Moderate stiffness, but with effort I can use":2, "Sometimes I cannot overcome the stiffness to use my arm or leg":3, "My arm or leg is so contracted that I cannot use it at all":4},
         "spasm_lt_leg": {"I do not have stiffness or spasms":0, "Mild, does not make it hard for me to use":1, "Moderate stiffness, but with effort I can use":2, "Sometimes I cannot overcome the stiffness to use my arm or leg":3, "My arm or leg is so contracted that I cannot use it at all":4},
-        "fatigue": {"I experience no fatigue":0,"I experience mild fatigue. I do feel the need to rest more often, but I can still complete all my daily tasks":1,"Due to my fatigue I have to rest unusually often; this affects less than half of my daily activities. I often cannot complete my daily routine without naps or significant rest.":2}}
+        "fatigue": {"I experience no fatigue":0,"I experience mild fatigue. I do feel the need to rest more often, but I can still complete all my daily tasks":1,"Due to my fatigue I have to rest unusually often; this affects less than half of my daily activities. I often cannot complete my daily routine without naps or significant rest.":2},
+        "blind_spots": {"I do not have any blind spots in my vision": 0, "My doctor has told me I have a blind spot but I do not notice it":1,"Yes, I notice a blind spot in my vision":2}}
+
+BRAINWALK_FIELD_INT_TO_MAX_SCORE_MAP = {
+    "bowel_bladder_total_score": 3,
+    "bowel_bladder_max": 4,
+    "bladder_urgency_change": 1,
+     "mfis_score": 84,
+     "mfis_cognitive_score": 40
+}
 
 class BrainWalkData:
     def __init__(self, row,labels,template_svg_path):
@@ -70,14 +79,27 @@ class BrainWalkData:
         max_score = 0
         scores = {}
         for field in fields:
-            map = BRAINWALK_FIELD_STRING_TO_INT_SCORE[field] if field in BRAINWALK_FIELD_STRING_TO_INT_SCORE.keys() else {}
+            map = {}
             value = 0
             string_entry = ""
-            if field in row.keys():
-                string_entry = row[field]
+            if field in BRAINWALK_FIELD_STRING_TO_INT_SCORE.keys():
+                # In this case, field has value of type string (ex. string survey response).
+                # Since each survey response maps to an int value, we convert this to a score.
+                map = BRAINWALK_FIELD_STRING_TO_INT_SCORE[field]
+                string_entry = ""
+                if field in row.keys():
+                    string_entry = row[field]
                 value = map[string_entry]/(len(map.keys())-1) if string_entry != "" else 0
-                max_score = max(max_score,value)
+            elif field in BRAINWALK_FIELD_INT_TO_MAX_SCORE_MAP.keys():
+                # In this case, field has value of type int (ex. MFIS score).
+                # Here, we calculate the score relative to the max score.
+                max_possible_score = BRAINWALK_FIELD_INT_TO_MAX_SCORE_MAP[field]
+                if field in row.keys():
+                    value = int(row[field])/max_possible_score
+                string_entry = str(row[field])
+            # Set values to display and set new max score for body part.
             scores[field] = string_entry
+            max_score = max(max_score,value)
         style = ShapeStyle({"fill": self.intensity2color(max_score)})
         element.set("style", str(style))
         return scores
