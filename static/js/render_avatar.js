@@ -5,8 +5,11 @@ d3.xml(avatarUrl).then(function(xml) {
         .style('opacity', 0)
         .style('width', 'auto') // Set the width of the tooltip
         .style('height', 'auto')
-        .style("background-color", "#fff") // Set background color
-        .style("border", "1px solid #ccc");
+        .style("background-color", "white")
+        .style("border", "solid")
+        .style("border-width", "2px")
+        .style("border-radius", "5px")
+        .style("padding", "5px");
     d3.select("body").node().appendChild(xml.documentElement);
     pathElements = d3.selectAll("path");
     pathElements.on("mouseover", mouseMoveOrMouseOver);
@@ -45,5 +48,8 @@ d3.xml(avatarUrl).then(function(xml) {
         .style("top", (d3.event.offsetY + 10) + "px")
         .style("display", "block");
         pathElement.style('stroke','green').style('stroke-width','2px');
+    }
+    function transitionTooltip(shouldShow){
+
     }
 });
