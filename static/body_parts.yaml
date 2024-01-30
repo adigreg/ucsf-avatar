@@ -11,7 +11,3 @@ group_front:
     - abdomen
     - leg_left
     - leg_right
-    - eye_left
-    - eye_right
-    - mouth
-    - nose

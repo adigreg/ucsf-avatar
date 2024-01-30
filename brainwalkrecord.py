@@ -9,13 +9,10 @@ BODY_PART_TO_BRAINWALK_FIELDS = {"arm_right":["right_arm","strength_rt_arm","spa
         "arm_left":["left_arm","strength_lt_arm","spasm_lt_arm","tremor_arms"],
         "leg_right":["right_leg","strength_rt_leg","spasm_rt_leg","tremor_legs"],
         "leg_left": ["left_leg","strength_lt_leg","spasm_lt_leg","tremor_legs"],
-        "eye_left": ["vision_lt","blind_spots"],
-        "eye_right":["vision_rt","blind_spots"],
-        "face_right":["rt_face","feeling_rt"],
-        "face_left":["lt_face","feeling_lt"],
+        "face_right":["rt_face","feeling_rt","vision_rt","blind_spots","speak"],
+        "face_left":["lt_face","feeling_lt","vision_lt","blind_spots","speak"],
         "abdomen":["bowel_bladder_max","bladder_urgency_change"],
         "brain": ["cognition","fatigue","mfis_score","mfis_cognitive_score"],
-        "mouth":["speak"],
         "neck":["swallow"],
         "ear_left":["hearing"],
         "ear_right":["hearing"]}
@@ -72,20 +69,10 @@ class BrainWalkData:
                 scores, max_score = self.parseScores(id,row)
                 self.body_parts[id] = scores
                 style = ShapeStyle({"fill": self.intensity2color(max_score)})
-                if id == "brain":
-                    # recurse on elements
-                    self.recurseOnBrain(element,style)
                 element.set("style", str(style))   
         final_path = os.path.join(os.getcwd(),'static','patient_avatars','avatar_patient.svg')
         self.tree.write(final_path)
 
-    def recurseOnBrain(self,element,style):
-        if element == None:
-            return
-        for child in list(element):
-            child.set("style", str(style))
-            self.recurseOnBrain(child,style)
-  
     def parseScores(self,name,row):
         fields = BODY_PART_TO_BRAINWALK_FIELDS[name] if name in BODY_PART_TO_BRAINWALK_FIELDS.keys() else []
         max_score = 0
