@@ -3,7 +3,7 @@ d3.xml(avatarUrl).then(function(xml) {
         .attr('class', 'tooltip')
         .style('position','absolute')
         .style('opacity', 0)
-        .style('width', 'auto') // Set the width of the tooltip
+        .style('width', 'auto')
         .style('height', 'auto')
         .style("background-color", "white")
         .style("border", "solid")

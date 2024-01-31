@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<!-- Load d3.js -->
 <script src="https://d3js.org/d3.v5.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
 
-<!-- Create an element where the map will take place -->
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -15,7 +13,7 @@
     <title>Embedded SVG</title>
 </head>
 <body>
-    {% if patientId %}
+    {% if patientId and data != {} %}
     <script>
         var bodyPartData = {{ data | tojson }};
         var avatarUrl = "{{ url_for('static', filename='patient_avatars/avatar_patient.svg') }}"
