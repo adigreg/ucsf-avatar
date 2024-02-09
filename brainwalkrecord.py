@@ -4,6 +4,7 @@ from enum import Enum
 from xml.etree import ElementTree as ET
 import os 
 import logging
+import yaml
 
 BODY_PART_TO_BRAINWALK_FIELDS = {"arm_right":["right_arm","strength_rt_arm","spasm_rt_arm","tremor_arms"],
         "arm_left":["left_arm","strength_lt_arm","spasm_lt_arm","tremor_arms"],
@@ -53,25 +54,45 @@ BRAINWALK_FIELD_INT_TO_MAX_SCORE_MAP = {
 }
 
 class BrainWalkData:
-    def __init__(self, row,labels,template_svg_path):
+    def __init__(self, row,labels):
         logging.basicConfig(level=logging.DEBUG)
         self.patient_id = row['DeID']
         self.labels = labels
         ET.register_namespace("","http://www.w3.org/2000/svg")
-        self.tree = ET.ElementTree(file=template_svg_path)
         self.body_parts = {}
         self.initializeBodyPartData(row)
 
     def initializeBodyPartData(self,row):
-        for element in self.tree.iter():
-            id = element.get("id")
-            if id in self.labels:
-                scores, max_score = self.parseScores(id,row)
-                self.body_parts[id] = scores
-                style = ShapeStyle({"fill": self.intensity2color(max_score)})
-                element.set("style", str(style))   
-        final_path = os.path.join(os.getcwd(),'static','patient_avatars','avatar_patient.svg')
-        self.tree.write(final_path)
+        labels = self.getLabels()
+        for id in labels:
+            logging.debug(id)
+            scores, max_score = self.parseScores(id,row)
+            self.body_parts[id] = {"scores":scores, "color": self.intensity2color(max_score)}
+    #         style = ShapeStyle({"fill": self.intensity2color(max_score)})
+        #         element.set("style", str(style))   
+        # final_path = os.path.join(os.getcwd(),'static','patient_avatars','avatar_patient.svg')
+        # self.tree.write(final_path)
+                
+    def getLabels(self):
+        def leaf_labels(obj):
+            def iter_dict(dc):
+                for k, v in dc.items():
+                    if not v:
+                        yield k
+                    elif isinstance(v, dict):
+                        for key in iter_dict(v):
+                            yield key
+                    else:
+                        for val in v:
+                            yield val
+
+            assert isinstance(obj, dict)
+            for key in iter_dict(obj):
+                yield key
+        yaml_path = os.path.join(os.getcwd(), 'static', 'body_parts.yaml')
+        with open(yaml_path) as f:
+            vocab_tree = yaml.full_load(f)
+        return set(leaf_labels(vocab_tree))
 
     def parseScores(self,name,row):
         fields = BODY_PART_TO_BRAINWALK_FIELDS[name] if name in BODY_PART_TO_BRAINWALK_FIELDS.keys() else []

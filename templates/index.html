@@ -16,6 +16,7 @@
     {% if patientId and data != {} %}
     <script>
         var bodyPartData = {{ data | tojson }};
+        var avatarTemplate = "{{ url_for('static', filename='avatar_template/standing body.svg') }}"
         var avatarUrl = "{{ url_for('static', filename='patient_avatars/avatar_patient.svg') }}"
     </script>
         <script src="{{ url_for('static', filename='js/render_avatar.js') }}" ></script>
