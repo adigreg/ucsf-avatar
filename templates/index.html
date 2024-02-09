@@ -11,9 +11,78 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Embedded SVG</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .button-container {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .button {
+            margin-right: 10px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #2980b9;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .button:last-child {
+            margin-right: 0;
+        }
+
+        .button:hover {
+            background-color: #2c3e50;
+        }
+
+        .color-selector {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #fff;
+            margin-left: 10px;
+            margin-right: 20px;
+            background: conic-gradient(
+                from 0deg,
+                red,
+                yellow,
+                lime,
+                aqua,
+                blue,
+                magenta,
+                red
+            );
+        }
+    </style>
 </head>
 <body>
     {% if patientId and data != {} %}
+    <div class="top-bar">
+    <div class="button-container">
+        <button class="button">Male</button>
+        <button class="button">Female</button>
+        <button class="button">Neutral</button>
+    </div>
+    <div class="color-selector" id="colorSelector"></div>
+</div>
+
     <script>
         var bodyPartData = {{ data | tojson }};
         var avatarUrl = "{{ url_for('static', filename='patient_avatars/avatar_patient.svg') }}"
