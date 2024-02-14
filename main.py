@@ -22,12 +22,11 @@ def main():
 def getPatientData(patientId):
     file_name = 'avatar_data.csv'
     file_path = os.path.join(os.getcwd(), 'static', file_name)
-    template_path = os.path.join(os.getcwd(), 'static', 'avatar_template','standing body.svg')
     with open(file_path, 'r',encoding="Windows-1252") as csvfile:
         csv_reader = csv.DictReader(csvfile)
         for row in csv_reader:
             if row['DeID'] == patientId:
-                brainWalkData = BrainWalkData(row,template_path)
+                brainWalkData = BrainWalkData(row)
                 return jsonify(brainWalkData.body_parts)
     return jsonify({})
     

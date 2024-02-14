@@ -54,11 +54,9 @@ BRAINWALK_FIELD_INT_TO_MAX_SCORE_MAP = {
 }
 
 class BrainWalkData:
-    def __init__(self, row,labels):
+    def __init__(self, row):
         logging.basicConfig(level=logging.DEBUG)
         self.patient_id = row['DeID']
-        self.labels = labels
-        ET.register_namespace("","http://www.w3.org/2000/svg")
         self.body_parts = {}
         self.initializeBodyPartData(row)
 
@@ -68,10 +66,6 @@ class BrainWalkData:
             logging.debug(id)
             scores, max_score = self.parseScores(id,row)
             self.body_parts[id] = {"scores":scores, "color": self.intensity2color(max_score)}
-    #         style = ShapeStyle({"fill": self.intensity2color(max_score)})
-        #         element.set("style", str(style))   
-        # final_path = os.path.join(os.getcwd(),'static','patient_avatars','avatar_patient.svg')
-        # self.tree.write(final_path)
                 
     def getLabels(self):
         def leaf_labels(obj):
@@ -139,37 +133,6 @@ class BrainWalkData:
             return "#649eff"
         else:
             return "#4188ff"
-
-class ShapeStyle(object):
-    base_styles = {
-        "fill": "#cccccc",
-        "fill-rule": "evenodd",
-        "stroke": "grey",
-        "stroke-width": "2px",
-        "stroke-linecap": "butt",
-        "stroke-linejoin": "miter",
-        "stroke-opacity": 1,
-    }
-
-    def __init__(self,styles):
-        styles = dict(styles)
-        # Safety dance
-        for k in styles:
-            if k not in self.base_styles:
-                raise ValueError("Unexpected style: %s" % k)
-        self._styles = self.base_styles.copy()
-        self._styles.update(styles)
-
-    def __getitem__(self, key):
-        return self._styles[key]
-
-    def __setitem__(self, key, value):
-        assert key in self._styles
-        self._styles[key] = value
-
-    def __str__(self):
-        return ';'.join("%s:%s" % (k, v)
-                        for k, v in sorted(self._styles.items()))
 
 
 
