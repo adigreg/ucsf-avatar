@@ -51,24 +51,10 @@
             background-color: #2c3e50;
         }
 
-        .color-selector {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid #fff;
-            margin-left: 10px;
-            margin-right: 20px;
-            background: conic-gradient(
-                from 0deg,
-                red,
-                yellow,
-                lime,
-                aqua,
-                blue,
-                magenta,
-                red
-            );
+        .checkbox-container {
+            position: fixed;
+            top: 10px;
+            right: 10px;
         }
     </style>
 </head>
@@ -80,14 +66,18 @@
         <button class="button">Female</button>
         <button class="button">Neutral</button>
     </div>
-    <div class="color-selector" id="colorSelector"></div>
     </div>
-
     <script>
-        var bodyPartData = {{ data | tojson }};
-        var avatarUrl = "{{ url_for('static', filename='avatar_template/male.svg') }}"
+        var surveyDataMap = {{ data | tojson }};
+        var avatarUrl = "{{ url_for('static', filename='avatar_template/neutral.svg') }}"
     </script>
-        <script src="{{ url_for('static', filename='js/render_avatar.js') }}" ></script>
+    <script type="module" src="{{ url_for('static', filename='js/render_avatar.js') }}" ></script>
+    <div class="checkbox-container">
+        <label><input id="tremor" type="checkbox" name="symptom" value="tremor"> Tremor</label><br>
+        <label><input id="spasm" type="checkbox" name="symptom" value="spasm"> Spasm</label><br>
+        <label><input id="strength" type="checkbox" name="symptom" value="strength"> Strength</label><br>
+        <label><input id="weakness" type="checkbox" name="symptom" value="weakness"> Weakness</label><br>
+      </div>
     {% else %}
         <h1>No patient found. Please provide a valid patient ID.</h1>
     {% endif %}

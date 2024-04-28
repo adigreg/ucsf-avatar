@@ -27,7 +27,7 @@ def getPatientData(patientId):
         for row in csv_reader:
             if row['DeID'] == patientId:
                 brainWalkData = BrainWalkData(row)
-                return jsonify(brainWalkData.body_parts)
+                return jsonify(brainWalkData.survey_with_scores)
     return jsonify({})
     
 if __name__ == '__main__':

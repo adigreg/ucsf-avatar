@@ -6,18 +6,6 @@ import os
 import logging
 import yaml
 
-BODY_PART_TO_BRAINWALK_FIELDS = {"arm_right":["right_arm","strength_rt_arm","spasm_rt_arm","tremor_arms"],
-        "arm_left":["left_arm","strength_lt_arm","spasm_lt_arm","tremor_arms"],
-        "leg_right":["right_leg","strength_rt_leg","spasm_rt_leg","tremor_legs"],
-        "leg_left": ["left_leg","strength_lt_leg","spasm_lt_leg","tremor_legs"],
-        "face_right":["rt_face","feeling_rt","vision_rt","blind_spots","speak"],
-        "face_left":["lt_face","feeling_lt","vision_lt","blind_spots","speak"],
-        "abdomen":["bowel_bladder_max","bladder_urgency_change"],
-        "brain": ["cognition","fatigue","mfis_score","mfis_cognitive_score"],
-        "neck":["swallow"],
-        "ear_left":["hearing"],
-        "ear_right":["hearing"]}
-
 BRAINWALK_FIELD_STRING_TO_INT_SCORE = {"speak": {"I do not have problems speaking":0, "I sometimes slur words but others don't seem to notice":1, "I often slur words and others notice":2, "I slur words so much that it interferes with my ability to have conversations":3, "I slur my words so much that others cannot understand me":4, "I cannot speak":5},
         "swallow": {"I do not have any problems swallowing liquids or foods":0, "I have problems swallowing liquids or solid foods":1, "I have frequent problems with swallowing and need a pureed diet":2, "I cannot swallow food or liquids":3},
         "hearing": {"I do not have problems hearing":0, "I have mild hearing loss on one side":1, "I have moderate or severe hearing loss on one side":2, "I have total hearing loss on both sides. I am effectively deaf.":3}, 
@@ -57,42 +45,12 @@ class BrainWalkData:
     def __init__(self, row):
         logging.basicConfig(level=logging.DEBUG)
         self.patient_id = row['DeID']
-        self.body_parts = {}
-        self.initializeBodyPartData(row)
+        self.survey_with_scores = {}
+        self.parseScores(row)
 
-    def initializeBodyPartData(self,row):
-        labels = self.getLabels()
-        for id in labels:
-            logging.debug(id)
-            scores, max_score = self.parseScores(id,row)
-            self.body_parts[id] = {"scores":scores, "color": self.intensity2color(max_score)}
-                
-    def getLabels(self):
-        def leaf_labels(obj):
-            def iter_dict(dc):
-                for k, v in dc.items():
-                    if not v:
-                        yield k
-                    elif isinstance(v, dict):
-                        for key in iter_dict(v):
-                            yield key
-                    else:
-                        for val in v:
-                            yield val
-
-            assert isinstance(obj, dict)
-            for key in iter_dict(obj):
-                yield key
-        yaml_path = os.path.join(os.getcwd(), 'static', 'body_parts.yaml')
-        with open(yaml_path) as f:
-            vocab_tree = yaml.full_load(f)
-        return set(leaf_labels(vocab_tree))
-
-    def parseScores(self,name,row):
-        fields = BODY_PART_TO_BRAINWALK_FIELDS[name] if name in BODY_PART_TO_BRAINWALK_FIELDS.keys() else []
-        max_score = 0
+    def parseScores(self,row):
         scores = {}
-        for field in fields:
+        for field in row:
             map = {}
             value = 0
             string_entry = ""
@@ -112,27 +70,12 @@ class BrainWalkData:
                     value = int(row[field])/max_possible_score
                 string_entry = str(row[field])
             # Set values to display and set new max score for body part.
-            scores[field] = string_entry
-            max_score = max(max_score,value)
-        return scores, max_score
-
-    def intensity2color(self,scale):
-        """
-        Map score to shades of blue (if score is zero, map to grey).
-        """
-        assert 0.0 <= scale <= 1.0
-        if scale == 0:
-            return "#cccccc"
-        elif scale <= 0.2:
-            return "#accbff"
-        elif scale <= 0.4:
-            return "#92bbff"
-        elif scale <= 0.6:
-            return "#78aaff"
-        elif scale <= 0.8:
-            return "#649eff"
-        else:
-            return "#4188ff"
+            if field in ["right_arm", "right_leg", "left_arm", "left_leg"]:
+                field = "feeling_" + field
+            if field in ["rt_face", "lt_face"]:
+                field = "weakness_" + field
+            scores[field] = [value,string_entry]
+        self.survey_with_scores = scores
 
 
 
