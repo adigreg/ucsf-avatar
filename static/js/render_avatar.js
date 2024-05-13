@@ -34,38 +34,69 @@ const SYMPTOM_TO_BRAINWALK_FIELDS = {
     "speak" : ["speak"],
     };
 
-    const BRAINwALK_FIELD_TO_BODY_PART = {
-        "tremor_arms": ["arm_right", "arm_left"],
-        "tremor_legs": ["leg_right", "leg_left"],
-        "strength_rt_arm": ["arm_right"],
-        "strength_lt_arm": ["arm_left"],
-        "strength_rt_leg": ["leg_right"],
-        "strength_lt_leg": ["leg_left"],
-        "spasm_rt_arm": ["arm_right"],
-        "spasm_lt_arm": ["arm_left"],
-        "spasm_rt_leg": ["leg_right"],
-        "spasm_lt_leg": ["leg_left"],
-        "feeling_right_arm": ["arm_right"],
-        "feeling_left_arm": ["arm_left"],
-        "feeling_right_leg": ["leg_right"],
-        "feeling_left_leg": ["leg_left"],
-        "feeling_rt": ["face_right"],
-        "feeling_lt": ["face_left"],
-        "cognition": ["brain"],
-        "fatigue": ["brain"],
-        "bladder_urgency_change": ["abdomen"],
-        "bowel_bladder_max": ["abdomen"],
-        "swallow": ["neck"],
-        "speak": ["face_right", "face_left"],
-        "weakness_rt_face": ["face_right"],
-        "weakness_lt_face": ["face_left"],
-        "vision_rt": ["face_right"],
-        "vision_lt": ["face_left"],
-        "blind_spots": ["face_right", "face_left"],
-        "mfis_score": ["brain"],
-        "mfis_cognitive_score": ["brain"],
-        "hearing": ["ear_left", "ear_right"]
-    };
+class PairedStack {
+    constructor() {
+        this.stack = [];
+    }
+    
+    // Push a paired item (string, number) onto the stack
+    pushAndSort(item, score) {
+        this.stack.push({ item, score });
+        this.stack.sort((a, b) => a.score - b.score); // Sort by score (ascending order)
+    }
+
+    push(item, score) {
+        this.stack.push({ item, score });
+    }
+    
+    // Pop the top paired item from the stack
+    pop() {
+        return this.stack.pop();
+    }
+    
+    // Peek at the top paired item without removing it
+    peek() {
+        return this.stack[this.stack.length - 1];
+    }
+
+    removeByValue(itemToRemove) {
+        const index = this.stack.findIndex(pair => pair.item === itemToRemove);
+        if (index !== -1) {
+          this.stack.splice(index, 1);
+        }
+    }
+    
+    // Check if the stack is empty
+    isEmpty() {
+        return this.stack.length === 0;
+    }
+    
+    // Get the size of the stack
+    size() {
+        return this.stack.length;
+    }
+    
+    // Print the stack
+    print() {
+        console.log(this.stack.map(pair => `${pair.item} (${pair.score})`).join(' -> '));
+    }
+    }
+
+class BodyPart {
+    constructor(name) {
+        this.name = name;
+        this.paired_stack = new PairedStack();
+        this.initializeBodyPart();
+    }
+    // takes in surveydatamap
+    initializeBodyPart() {
+        for(const field of BODY_PART_TO_BRAINWALK_FIELDS[this.name]){
+            const score = surveyDataMap[field][0];
+            this.paired_stack.pushAndSort(field,score);
+        }
+    }
+
+}
 
 class BrainWalkRecord {
     constructor(surveyDataMap){
@@ -73,64 +104,75 @@ class BrainWalkRecord {
         this.body_part_to_score = {};
         this.body_part_to_color = {};
         this.initializeScoresAndColors();
-        this.checked_boxes = new Set(['tremor','strength','spasm','weakness','feeling'])
         this.handleCheckboxChanged = this.handleCheckboxChanged.bind(this)
         this.handleTemplateChanged = this.handleTemplateChanged.bind(this)
-        this.renderAvatar(this.body_part_to_color,this.body_part_to_score,"")
+        this.handleCheckedBox = this.handleCheckedBox.bind(this)
+        this.handleUncheckedBox = this.handleUncheckedBox.bind(this)
+        this.renderAvatar(this.body_part_to_color,this.body_part_to_score,avatarUrl)
     }
 
     initializeScoresAndColors(){
         for(const bodyPart in BODY_PART_TO_BRAINWALK_FIELDS){
-            let maxScore = 0;
-            for(let i = 0; i < BODY_PART_TO_BRAINWALK_FIELDS[bodyPart].length; i++){
-                let field = BODY_PART_TO_BRAINWALK_FIELDS[bodyPart][i]
-                maxScore = Math.max(maxScore,this.survey_data_map[field][0]);
-                this.body_part_to_score[bodyPart] = maxScore
-            }
-            this.body_part_to_color[bodyPart] = this.getColor(maxScore)
+            let newBodyPart = new BodyPart(bodyPart)
+            let score = newBodyPart.paired_stack.peek().score
+            this.body_part_to_score[bodyPart] = newBodyPart
+            this.body_part_to_color[bodyPart] = this.getColor(score)
         }
     }
 
     handleCheckboxChanged(event){
         let box = event.target.id
         if(event.target.checked){
-            this.checked_boxes.add(box)
-            for(const bodyPart in SYMPTOM_TO_LIMB_DATA[box]){
-                const field = SYMPTOM_TO_LIMB_DATA[box][bodyPart]
-                if(this.survey_data_map[field][0] > this.body_part_to_score[bodyPart]){
-                    this.body_part_to_score[bodyPart] = this.survey_data_map[field][0]
-                    this.body_part_to_color[bodyPart] = this.getColor(this.survey_data_map[field][0])
-                    d3.select("path#" + bodyPart).style('fill',this.body_part_to_color[bodyPart])
-                }
-            }
+            this.handleCheckedBox(box)
         } else {
-            this.checked_boxes.delete(box)
-            for(const bodyPart in BODY_PART_TO_BRAINWALK_FIELDS){
-                if(['arm_left','arm_right','leg_left','leg_right'].includes(bodyPart)){
-                    this.body_part_to_score[bodyPart] = 0
-                    this.body_part_to_color[bodyPart] = this.getColor(0)
-                    d3.select("path#" + bodyPart).style('fill',this.body_part_to_color[bodyPart])
-                }
+            this.handleUncheckedBox(box)
+        }
+    }
+
+    handleCheckedBox(box){
+        // Iterate through each body part involved in that symptom.
+        for(const bodyPart in SYMPTOM_TO_LIMB_DATA[box]){
+            let bodyPartObject = this.body_part_to_score[bodyPart]
+            let fieldFromCheckedBox = SYMPTOM_TO_LIMB_DATA[box][bodyPart]
+            if(fieldFromCheckedBox == null){
+                continue
             }
-            for(const symptom in SYMPTOM_TO_LIMB_DATA){
-                if(this.checked_boxes.has(symptom)){
-                    for(const bodyPart in SYMPTOM_TO_LIMB_DATA[symptom]){
-                        for(const field of BODY_PART_TO_BRAINWALK_FIELDS[bodyPart]){
-                            if(SYMPTOM_TO_BRAINWALK_FIELDS[symptom].includes(field)){
-                                this.body_part_to_score[bodyPart] = Math.max(this.body_part_to_score[bodyPart],this.survey_data_map[field][0])
-                            }
-                        }
-                        this.body_part_to_color[bodyPart] = this.getColor(this.body_part_to_score[bodyPart])
-                        d3.select("path#" + bodyPart).style('fill',this.body_part_to_color[bodyPart])
-                    }
-                }
+            let fieldFromCheckedBoxScore = this.survey_data_map[fieldFromCheckedBox][0]
+            let topItem = bodyPartObject.paired_stack.peek()
+            if(topItem.score < fieldFromCheckedBoxScore){
+                bodyPartObject.paired_stack.push(fieldFromCheckedBox, fieldFromCheckedBoxScore)
+                this.body_part_to_color[bodyPart] = this.getColor(fieldFromCheckedBoxScore)
+                d3.select("path#" + bodyPart).style('fill',this.body_part_to_color[bodyPart])
+            } else {
+                bodyPartObject.paired_stack.pushAndSort(fieldFromCheckedBox, fieldFromCheckedBoxScore)
             }
         }
     }
 
+    handleUncheckedBox(box){
+        for(const bodyPart in SYMPTOM_TO_LIMB_DATA[box]){
+            let bodyPartObject = this.body_part_to_score[bodyPart]
+            let uncheckedBoxField = SYMPTOM_TO_LIMB_DATA[box][bodyPart]
+            let topItem = bodyPartObject.paired_stack.peek()
+            if(topItem.item == uncheckedBoxField){
+                bodyPartObject.paired_stack.pop()
+                if(bodyPartObject.paired_stack.isEmpty()){
+                    this.body_part_to_color = this.getColor(0)
+                    d3.select("path#" + bodyPart).style('fill',0)
+                    return
+                }
+                let newTopItem = bodyPartObject.paired_stack.peek()
+                this.body_part_to_color[bodyPart] = this.getColor(newTopItem.score)
+                d3.select("path#" + bodyPart).style('fill',this.body_part_to_color[bodyPart])
+            } else {
+                bodyPartObject.paired_stack.removeByValue(uncheckedBoxField)
+            }
+        }
+    }
+
+    // Modify the avatarUrl based on the selected gender
     handleTemplateChanged(event){
         let gender = event.target.id
-        // Modify the avatarUrl based on the selected gender
         if (gender === 'male') {
             avatarUrl = "static/avatar_template/male.svg";
         } else if (gender === 'female') {
@@ -138,10 +180,10 @@ class BrainWalkRecord {
         } else if (gender === 'neutral') {
             avatarUrl = "static/avatar_template/neutral.svg";
         }
-
-        // Re-render the avatar
+        // Re-render the avatar with the new template
         this.renderAvatar(this.body_part_to_color,this.body_part_to_score,avatarUrl);
     }
+    
 
     getColor(score){
         if(score == 0){
@@ -161,8 +203,7 @@ class BrainWalkRecord {
 
     renderAvatar(bodyPartToColor,bodyPartToScore,newAvatarUrl){
         d3.selectAll('svg').remove();
-        let finalUrl = newAvatarUrl != "" ? newAvatarUrl : avatarUrl
-        d3.xml(finalUrl).then(function(xml) {
+        d3.xml(newAvatarUrl).then(function(xml) {
             var tooltip = d3.select("body").append('div')
                 .attr('class', 'tooltip')
                 .style('position','absolute')
@@ -202,12 +243,10 @@ class BrainWalkRecord {
                     id = "brain"
                 }
                 var formattedHtml = ""
-                for(var brainWalkField of BODY_PART_TO_BRAINWALK_FIELDS[id]){
-                    var surveyScore = surveyDataMap[brainWalkField][0]
-                    var surveyValue = surveyDataMap[brainWalkField][1]
+                for(var brainWalkObject of bodyPartToScore[id].paired_stack.stack){
                     formattedHtml += 
-                    "<div><strong>" + brainWalkField + "</strong>" + "</div>"
-                    + "<div>" + surveyValue + "</div>";
+                    "<div><strong>" + brainWalkObject.item + "</strong>" + "</div>"
+                    + "<div>" + brainWalkObject.score + "</div>";
                 }
                 if(formattedHtml == ""){
                     formattedHtml = "<div>No issues with " + id + "!</div>"

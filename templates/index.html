@@ -73,11 +73,17 @@
     </script>
     <script type="module" src="{{ url_for('static', filename='js/render_avatar.js') }}" ></script>
     <div class="checkbox-container">
+        <p1>Limb Data</p1><br>
         <label><input id="feeling" type="checkbox" name="symptom" value="feeling" checked> Feeling</label><br>
         <label><input id="tremor" type="checkbox" name="symptom" value="tremor" checked> Tremor</label><br>
         <label><input id="spasm" type="checkbox" name="symptom" value="spasm" checked> Spasm</label><br>
         <label><input id="strength" type="checkbox" name="symptom" value="strength" checked> Strength</label><br>
         <label><input id="weakness" type="checkbox" name="symptom" value="weakness" checked> Weakness</label><br>
+        <p1>Brain Health</p1>
+        <label><input id="cognition" type="checkbox" name="symptom" value="feeling" checked> Feeling</label><br>
+        <label><input id="fatigue" type="checkbox" name="symptom" value="tremor" checked> Tremor</label><br>
+        <label><input id="depression" type="checkbox" name="symptom" value="feeling" checked> Feeling</label><br>
+        <label><input id="anxiety" type="checkbox" name="symptom" value="tremor" checked> Tremor</label><br>
       </div>
     {% else %}
         <h1>No patient found. Please provide a valid patient ID.</h1>
