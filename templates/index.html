@@ -16,10 +16,12 @@
             margin: 0;
             padding: 0;
             font-family: 'Arial', sans-serif;
+            font-size: larger;
             background-color: #f0f0f0;
         }
 
         .top-bar {
+            position: fixed;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -29,14 +31,16 @@
         .button-container {
             display: flex;
             margin-bottom: 10px;
+            margin-top: 10px;
+            margin-left: 10px;
         }
 
         .button {
+            font-weight: bold;
             margin-right: 10px;
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
-            font-size: 16px;
             color: #fff;
             background-color: #2980b9;
             cursor: pointer;
@@ -56,15 +60,50 @@
             top: 10px;
             right: 10px;
         }
+
+        .category {
+            margin-bottom: 20px; /* Add some space between categories */
+        }
+
+        .category-title {
+            font-weight: bold; /* Make the category title bold */
+            margin-bottom: 5px; /* Add some space below the category title */
+            cursor: pointer; /* Change cursor to pointer on hover */
+            max-width: 200px; /* Adjust the maximum width as needed */
+            word-wrap: break-word;
+        }
+
+        .category-items {
+            display: none; /* Hide category items by default */
+            max-width: 200px; /* Adjust the maximum width as needed */
+            word-wrap: break-word;
+        }
+
+        .category-items.show {
+            display: block; /* Show category items when .show class is applied */
+        }
+
+        .toggle-arrow {
+            display: inline-block;
+            margin-right: 20px;
+            transition: transform 0.3s ease; /* Add smooth transition effect */
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-arrow.rotate {
+            transform: rotate(90deg); /* Rotate arrow when items are shown */
+        }
+
     </style>
 </head>
 <body>
     {% if patientId and data != {} %}
     <div class="top-bar">
     <div class="button-container">
+        <button class="button">Neutral</button>
         <button class="button">Male</button>
         <button class="button">Female</button>
-        <button class="button">Neutral</button>
     </div>
     </div>
     <script>
@@ -73,17 +112,33 @@
     </script>
     <script type="module" src="{{ url_for('static', filename='js/render_avatar.js') }}" ></script>
     <div class="checkbox-container">
-        <p1>Limb Data</p1><br>
-        <label><input id="feeling" type="checkbox" name="symptom" value="feeling" checked> Feeling</label><br>
-        <label><input id="tremor" type="checkbox" name="symptom" value="tremor" checked> Tremor</label><br>
-        <label><input id="spasm" type="checkbox" name="symptom" value="spasm" checked> Spasm</label><br>
-        <label><input id="strength" type="checkbox" name="symptom" value="strength" checked> Strength</label><br>
-        <label><input id="weakness" type="checkbox" name="symptom" value="weakness" checked> Weakness</label><br>
-        <p1>Brain Health</p1>
-        <label><input id="cognition" type="checkbox" name="symptom" value="feeling" checked> Feeling</label><br>
-        <label><input id="fatigue" type="checkbox" name="symptom" value="tremor" checked> Tremor</label><br>
-        <label><input id="depression" type="checkbox" name="symptom" value="feeling" checked> Feeling</label><br>
-        <label><input id="anxiety" type="checkbox" name="symptom" value="tremor" checked> Tremor</label><br>
+        <div class="category">
+            <p class="category-title"><span class="toggle-arrow">▶</span> Limb Health</p>
+            <div class="category-items">
+                <label><input id="feeling" type="checkbox" name="symptom" value="feeling" checked> Feeling</label><br>
+                <label><input id="tremor" type="checkbox" name="symptom" value="tremor" checked> Tremor</label><br>
+                <label><input id="spasm" type="checkbox" name="symptom" value="spasm" checked> Spasm</label><br>
+                <label><input id="strength" type="checkbox" name="symptom" value="strength" checked> Strength</label><br>
+                <label><input id="weakness" type="checkbox" name="symptom" value="weakness" checked> Weakness</label><br>
+            </div>
+        </div>
+        
+        <div class="category">
+            <p class="category-title"><span class="toggle-arrow">▶</span> Brain/Eye Health</p>
+            <div class="category-items">
+                <label><input id="cognition" type="checkbox" name="symptom" value="cognition" checked> Cognition</label><br>
+                <label><input id="fatigue" type="checkbox" name="symptom" value="fatigue" checked> Fatigue</label><br>
+                <label><input id="vision" type="checkbox" name="symptom" value="vision" checked> Vision</label><br>
+            </div>
+        </div>
+        
+        <div class="category">
+            <p class="category-title"><span class="toggle-arrow">▶</span> Bowel/Bladder Health</p>
+            <div class="category-items">
+                <label><input id="bowel" type="checkbox" name="symptom" value="bowel" checked> Bowel</label><br>
+                <label><input id="bladder" type="checkbox" name="symptom" value="bladder" checked> Bladder</label><br>
+            </div>
+        </div> 
       </div>
     {% else %}
         <h1>No patient found. Please provide a valid patient ID.</h1>
