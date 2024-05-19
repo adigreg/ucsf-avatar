@@ -210,7 +210,7 @@ class BrainWalkRecord {
                 .style("padding", "5px");
             d3.select("body").node().appendChild(xml.documentElement);
             var allPaths = d3.selectAll("path")
-            var excludedPaths = ['leg_left_feeling','leg_right_feeling','arm_right_feeling','arm_right_feeling']
+            var excludedPaths = ['leg_left_feeling','leg_right_feeling','arm_right_feeling','arm_right_feeling','face_left_feeling','face_right_feeling']
             var pathElements = allPaths.filter(function() {
                 var pathClass = this.getAttribute("class");
                 var pathID = this.getAttribute("id");
@@ -234,13 +234,17 @@ class BrainWalkRecord {
                 .style("left", (d3.event.offsetX + 30) + "px")
                 .style("top", (d3.event.offsetY + 10) + "px")
                 .style('opacity', 0);
-                pathElement.style('stroke','grey').style('stroke-width','2px');
                 var id = pathElement.attr('id');
                 let feeling = d3.select("path#" + id + "_feeling");
                 if(!feeling.empty()){
                     feeling.style('fill','#606060ff');
                     feeling.style('display','none');
                 }
+                var excludedPaths = ['leg_left_feeling','leg_right_feeling','arm_left_feeling','arm_right_feeling','face_left_feeling','face_right_feeling']
+                if(excludedPaths.includes(id)){
+                    return;
+                }
+                pathElement.style('stroke','grey').style('stroke-width','2px');
             });
             function mouseMoveOrMouseOver(d){
                 var pathElement = d3.select(this);
