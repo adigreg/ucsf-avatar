@@ -112,28 +112,40 @@
     </script>
     <script type="module" src="{{ url_for('static', filename='js/render_avatar.js') }}" ></script>
     <div class="checkbox-container">
-        <div class="category">
-            <p class="category-title"><span class="toggle-arrow">▶</span> Limb Health</p>
-            <div class="category-items">
-                <label><input id="feeling" type="checkbox" name="symptom" value="feeling" checked> Feeling</label><br>
-                <label><input id="tremor" type="checkbox" name="symptom" value="tremor" checked> Tremor</label><br>
-                <label><input id="spasm" type="checkbox" name="symptom" value="spasm" checked> Spasm</label><br>
-                <label><input id="strength" type="checkbox" name="symptom" value="strength" checked> Strength</label><br>
-                <label><input id="weakness" type="checkbox" name="symptom" value="weakness" checked> Weakness</label><br>
-            </div>
-        </div>
         
         <div class="category">
-            <p class="category-title"><span class="toggle-arrow">▶</span> Brain/Eye Health</p>
+            <p class="category-title"><span class="toggle-arrow">▶</span> Cognition</p>
             <div class="category-items">
                 <label><input id="cognition" type="checkbox" name="symptom" value="cognition" checked> Cognition</label><br>
                 <label><input id="fatigue" type="checkbox" name="symptom" value="fatigue" checked> Fatigue</label><br>
-                <label><input id="vision" type="checkbox" name="symptom" value="vision" checked> Vision</label><br>
             </div>
         </div>
-        
         <div class="category">
-            <p class="category-title"><span class="toggle-arrow">▶</span> Bowel/Bladder Health</p>
+            <p class="category-title"><span class="toggle-arrow">▶</span> Ears/Eye/Neck</p>
+            <div class="category-items">
+                <label><input id="vision" type="checkbox" name="symptom" value="vision" checked> Vision</label><br>
+                <label><input id="hearing" type="checkbox" name="symptom" value="hearing" checked> Hearing</label><br>
+                <label><input id="swallow" type="checkbox" name="symptom" value="swallow" checked> Swallow</label><br>
+                <label><input id="speak" type="checkbox" name="symptom" value="speak" checked> Speak</label><br>
+            </div>
+        </div>
+        <div class="category">
+            <p class="category-title"><span class="toggle-arrow">▶</span>Motor</p>
+            <div class="category-items">
+                <label><input id="tremor" type="checkbox" name="symptom" value="tremor" checked> Tremor</label><br>
+                <label><input id="spasm" type="checkbox" name="symptom" value="spasm" checked> Spasm</label><br>
+                <label><input id="strength" type="checkbox" name="symptom" value="strength" checked> Strength</label><br>
+            </div>
+        </div>
+        <div class="category">
+            <p class="category-title"><span class="toggle-arrow">▶</span>Sensation</p>
+            <div class="category-items">
+                <label><input id="feeling" type="checkbox" name="symptom" value="feeling" checked> Feeling</label><br>
+                <label><input id="weakness" type="checkbox" name="symptom" value="weakness" checked> Weakness</label><br>
+            </div>
+        </div>
+        <div class="category">
+            <p class="category-title"><span class="toggle-arrow">▶</span> Bowel/Bladder</p>
             <div class="category-items">
                 <label><input id="bowel" type="checkbox" name="symptom" value="bowel" checked> Bowel</label><br>
                 <label><input id="bladder" type="checkbox" name="symptom" value="bladder" checked> Bladder</label><br>

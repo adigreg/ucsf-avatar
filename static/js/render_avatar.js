@@ -2,12 +2,12 @@ const BODY_PART_TO_BRAINWALK_FIELDS = {"arm_right":["feeling_right_arm","strengt
         "arm_left":["feeling_left_arm","strength_lt_arm","spasm_lt_arm","tremor_arms"],
         "leg_right":["feeling_right_leg","strength_rt_leg","spasm_rt_leg","tremor_legs"],
         "leg_left": ["feeling_left_leg","strength_lt_leg","spasm_lt_leg","tremor_legs"],
-        "face_right":["weakness_rt_face","feeling_rt","speak"],
-        "face_left":["weakness_lt_face","feeling_lt","speak"],
+        "face_right":["weakness_rt_face","feeling_rt"],
+        "face_left":["weakness_lt_face","feeling_lt"],
         "abdomen":["bowel_bladder_max","bladder_urgency_change"],
-        "brain": ["cognition","fatigue","mfis_score","mfis_cognitive_score"],
+        "brain": ["cognition","fatigue"],
         "torso":[],
-        "neck":["swallow"],
+        "neck":["swallow","speak"],
         "eye_right":["vision_rt"],
         "eye_left":["vision_lt"],
         "ear_left":["hearing"],
@@ -17,13 +17,14 @@ const SYMPTOM_TO_BODY_PART_MAP = {
 "strength": {"arm_right": "strength_rt_arm","arm_left":"strength_lt_arm","leg_right": "strength_rt_leg","leg_left":"strength_lt_leg"},
 "spasm": {"arm_right": "spasm_rt_arm","arm_left":"spasm_lt_arm","leg_right": "spasm_rt_leg","leg_left":"spasm_lt_leg"},
 "feeling": {"arm_right": "feeling_right_arm","arm_left":"feeling_left_arm","leg_right": "feeling_right_leg","leg_left":"feeling_left_leg","face_right":"feeling_rt","face_left":"feeling_lt"},
+"weakness": {"face_right":"weakness_rt_face","face_left":"weakness_lt_face"},
 "cognition" : {"brain":"cognition"},
 "fatigue" : {"brain":"fatigue"},
 "bladder" : {"abdomen":"bladder_urgency_change"},
 "bowel" : {"abdomen":"bowel_bladder_max"},
 "swallow" : {"neck": "swallow"},
 "speak" : {"neck": "speak"},
-"vision" : {"face_right":"vision_rt","face_left":"vision_lt"},
+"vision" : {"eye_right":"vision_rt","eye_left":"vision_lt"},
 };
 
 class PairedStack {
@@ -145,8 +146,6 @@ class BrainWalkRecord {
         for(const bodyPart in SYMPTOM_TO_BODY_PART_MAP[box]){
             let bodyPartObject = this.body_part_to_score[bodyPart]
             let uncheckedBoxField = SYMPTOM_TO_BODY_PART_MAP[box][bodyPart]
-                console.log(bodyPartObject)
-                console.log(uncheckedBoxField)
             let topItem = bodyPartObject.paired_stack.peek()
             if(topItem.item == uncheckedBoxField){
                 bodyPartObject.paired_stack.pop()
@@ -251,7 +250,7 @@ class BrainWalkRecord {
                     return;
                 }
                 var formattedHtml = ""
-                for(let i = bodyPartToScore[id].paired_stack.size() - 1; i > 0; i--){
+                for(let i = bodyPartToScore[id].paired_stack.size() - 1; i >= 0; i--){
                     let brainWalkObject = bodyPartToScore[id].paired_stack.stack[i];
                     formattedHtml += 
                     "<div><strong>" + brainWalkObject.item + "</strong>" + "</div>"
