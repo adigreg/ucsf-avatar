@@ -206,10 +206,9 @@ class BrainWalkRecord {
     renderAvatar(bodyPartData,newAvatarUrl,symptom){
         // d3.select('#svg-' + symptom).remove();
         // d3.select("div.svg-"+symptom).remove();
-        d3.xml(newAvatarUrl).then(function(xml) {
-            var tooltip = d3.select("div.svg-"+symptom).append('div')
+        var tooltip = d3.select("div.svg-"+symptom).append('div')
                 .attr('class', 'tooltip')
-                .style('position','relative')
+                .style('position','absolute')
                 .style('opacity', 0)
                 .style('width', 'auto')
                 .style('height', 'auto')
@@ -218,6 +217,7 @@ class BrainWalkRecord {
                 .style("border-width", "2px")
                 .style("border-radius", "5px")
                 .style("padding", "5px");
+        d3.xml(newAvatarUrl).then(function(xml) {
             var svgElement = xml.documentElement;
             svgElement.setAttribute("id","svg-"+symptom)
             d3.select("div.svg-"+symptom).node().appendChild(svgElement);
@@ -262,7 +262,7 @@ class BrainWalkRecord {
                 .transition()
                 .style('opacity', 1)
                 .delay(0)
-                .style('position','relative')
+                .style('position','absolute')
                 .style("left", (d3.event.offsetX + 30) + "px")
                 .style("top", (d3.event.offsetY + 10) + "px")
                 .style("display", "block");
