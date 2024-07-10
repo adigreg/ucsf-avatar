@@ -53,16 +53,57 @@
         }
 
         select {
-            font-weight: bold;
-            font-size: 18px; /* Increase font size for larger text */
-            padding: 10px 20px;
+            position: relative;
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 10px;
+            font-size: 16px;
             border: none;
-            border-radius: 5px;
-            color: #fff;
-            background-color: #2980b9;
             cursor: pointer;
-            transition: background-color 0.3s ease;
-            margin-right: 20px;
+            margin-right: 30px;
+        }
+
+        
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            margin-right: 30px;
+        }
+
+        .dropdown-toggle {
+            background-color: #3498db;
+            color: white;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+
+        .dropdown-menu div {
+            padding: 12px 16px;
+            cursor: pointer;
+        }
+
+        .dropdown-menu div:hover {
+            background-color: #f1f1f1;
+        }
+
+        .dropdown-menu input {
+            margin-right: 10px;
+        }
+
+        .dropdown:hover .dropdown-menu {
+            display: block;
         }
 
         .svg-container {
@@ -88,18 +129,23 @@
             <option>Female</option>
             <option>Male</option>
         </select>
-        <select name="Bowel/Bladder" id="Bowel/Bladder">
-            <option>Bowel/Bladder</option>
-        </select>
-        <select name="Tremor" id="Tremor">
-            <option>Tremor</option>
-        </select>
-        <select name="Strength" id="Strength">
-            <option>Strength</option>
-        </select>
-        <select name="Sensation" id="Sensation">
-            <option>Sensation</option>
-        </select>
+        <div class="dropdown" id="bowel-bladder-options">
+            <button class="dropdown-toggle">Bowel/Bladder</button>
+            <div class="dropdown-menu" id="bowel-bladder-menu"></div>
+        </div>
+        <div class="dropdown" id="tremor-options">
+            <button class="dropdown-toggle">Tremor</button>
+            <div class="dropdown-menu" id="tremor-menu"></div>
+        </div>
+        <div class="dropdown" id="strength-options">
+            <button class="dropdown-toggle">Strength</button>
+            <div class="dropdown-menu" id="strength-menu"></div>
+        </div>
+        <div class="dropdown" id="sensation-options">
+            <button class="dropdown-toggle">Sensation</button>
+            <div class="dropdown-menu" id="sensation-menu"></div>
+        </div>
+
     </div>
     </div>
     <div class="svg-container">

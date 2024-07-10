@@ -18,6 +18,12 @@ const SYMPTOM_TO_BODY_PART_MAP = {
 "strength": {"arm_right": ["strength_rt_arm"],"arm_left":["strength_lt_arm"],"leg_right": ["strength_rt_leg"],"leg_left":["strength_lt_leg"]},
 "sensation": {"arm_right": ["feeling_right_arm"],"arm_left":["feeling_left_arm"],"leg_right": ["feeling_right_leg"],"leg_left":["feeling_left_leg"],"face_right":["feeling_rt"],"face_left":["feeling_lt"]},
 };
+const SYMPTOM_TO_BRAINWALK_FIELDS_MAP = {
+    "bowel-bladder" : ["bowel_bladder_max","bladder_urgency_change"],
+    "tremor": ["tremor_arms","tremor_legs"],
+    "strength": ["strength_rt_arm","strength_lt_arm","strength_rt_leg","strength_lt_leg"],
+    "sensation": ["feeling_right_arm","feeling_left_arm","feeling_right_leg","feeling_left_leg","feeling_rt","feeling_lt"],
+    };
 
 class PairedStack {
     constructor() {
@@ -77,7 +83,6 @@ class BodyPart {
     // takes in surveydatamap
     initializeBodyPart() {
         for(let field of SYMPTOM_TO_BODY_PART_MAP[this.symptom][this.name]){
-            console.log("initialize: ",this.symptom,this.name,field)
             const score = surveyDataMap[field][0];
             this.paired_stack.pushAndSort(field,score);
             this.color = this.getColor(this.paired_stack.isEmpty() ? 0 : this.paired_stack.peek().score)
@@ -122,7 +127,6 @@ class BrainWalkRecord {
     initializeBodyPartMap(){
         for(const symptom in SYMPTOM_TO_BODY_PART_MAP){
             for(const bodyPart in SYMPTOM_TO_BODY_PART_MAP[symptom]){
-                console.log(symptom,bodyPart)
                 let bodyPartData = new BodyPart(bodyPart,symptom)
                 this.symptom_to_body_parts[symptom][bodyPart] = bodyPartData
             }
@@ -206,6 +210,16 @@ class BrainWalkRecord {
     renderAvatar(bodyPartData,newAvatarUrl,symptom){
         // d3.select('#svg-' + symptom).remove();
         // d3.select("div.svg-"+symptom).remove();
+        const select = d3.select('#'+symptom + "-menu");
+        const selectDiv = select.selectAll('div').data(SYMPTOM_TO_BRAINWALK_FIELDS_MAP[symptom]).enter().append('div')
+        selectDiv.append('input')
+            .attr('type', 'checkbox')
+            .attr('id', (i) => `checkbox-${i}`)
+            .attr('value', i);
+        selectDiv.append('label')
+            .attr('for', (i) => `checkbox-label-${i}`)
+            .text(d => d);
+
         var tooltip = d3.select("div.svg-"+symptom).append('div')
                 .attr('class', 'tooltip')
                 .style('position','absolute')
