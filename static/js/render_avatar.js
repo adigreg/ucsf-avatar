@@ -117,10 +117,10 @@ class BrainWalkRecord {
         // symptom -> {name -> body part data}
         this.symptom_to_body_parts = {"bowel-bladder":{},"tremor":{},"strength":{},"sensation":{}};
         this.initializeBodyPartMap();
-        // this.handleDropdownChanged = this.handleDropdownChanged.bind(this)
         // this.handleTemplateChanged = this.handleTemplateChanged.bind(this)
-        // this.handleCheckedBox = this.handleCheckedBox.bind(this)
-        // this.handleUncheckedBox = this.handleUncheckedBox.bind(this)
+        this.handleCheckbox = this.handleCheckbox.bind(this)
+        this.handleCheckedBox = this.handleCheckedBox.bind(this)
+        this.handleUncheckedBox = this.handleUncheckedBox.bind(this)
         this.renderAvatars(this.symptom_to_body_parts,avatarUrl)
     }
 
@@ -133,55 +133,59 @@ class BrainWalkRecord {
         }
     }
 
-    // handleDropdownChanged(event){
-    //     let box = event.target.id
-    //     if(event.target.checked){
-    //         this.handleCheckedBox(box)
-    //     } else {
-    //         this.handleUncheckedBox(box)
-    //     }
-    // }
+    handleCheckbox(event){
+        let symptom = event.target.getAttribute('symptom')
+        let field = event.target.getAttribute('field')
+        if(event.target.checked == true){
+            this.handleCheckedBox(symptom,field)
+        } else{
+            this.handleUncheckedBox(symptom,field)
+        }
+    }
 
-    // handleCheckedBox(box){
-    //     // Iterate through each body part involved in that symptom.
-    //     for(const bodyPart in SYMPTOM_TO_BODY_PART_MAP[box]){
-    //         let bodyPartObject = this.body_part_to_score[bodyPart]
-    //         let fieldFromCheckedBox = SYMPTOM_TO_BODY_PART_MAP[box][bodyPart]
-    //         if(fieldFromCheckedBox == null){
-    //             continue
-    //         }
-    //         let fieldFromCheckedBoxScore = this.survey_data_map[fieldFromCheckedBox][0]
-    //         let topItem = bodyPartObject.paired_stack.peek()
-    //         if(bodyPartObject.paired_stack.isEmpty() || topItem.score < fieldFromCheckedBoxScore){
-    //             bodyPartObject.paired_stack.push(fieldFromCheckedBox, fieldFromCheckedBoxScore)
-    //             this.body_part_to_color[bodyPart] = this.getColor(fieldFromCheckedBoxScore)
-    //             d3.select("path#" + bodyPart).style('fill',this.body_part_to_color[bodyPart])
-    //         } else {
-    //             bodyPartObject.paired_stack.pushAndSort(fieldFromCheckedBox, fieldFromCheckedBoxScore)
-    //         }
-    //     }
-    // }
+    handleCheckedBox(symptom,field){
+        // Iterate through each body part involved in that symptom.
+        for(const bodyPart in SYMPTOM_TO_BODY_PART_MAP[symptom]){
+            let bodyPartObject = this.symptom_to_body_parts[symptom][bodyPart]
+            let fieldsFromCheckedBox = SYMPTOM_TO_BODY_PART_MAP[symptom][bodyPart]
+            if(!fieldsFromCheckedBox.includes(field)){
+                continue
+            }
+            let fieldFromCheckedBoxScore = this.survey_data_map[field][0]
+            let topItem = bodyPartObject.paired_stack.peek()
+            if(bodyPartObject.paired_stack.isEmpty() || topItem.score < fieldFromCheckedBoxScore){
+                bodyPartObject.paired_stack.push(field, fieldFromCheckedBoxScore)
+                bodyPartObject.color = bodyPartObject.getColor(fieldFromCheckedBoxScore)
+                d3.select("#svg-"+symptom).selectAll("path#" + bodyPart).style('fill',bodyPartObject.color)
+            } else {
+                bodyPartObject.paired_stack.pushAndSort(field, fieldFromCheckedBoxScore)
+            }
+        }
+    }
 
-    // handleUncheckedBox(box){
-    //     for(const bodyPart in SYMPTOM_TO_BODY_PART_MAP[box]){
-    //         let bodyPartObject = this.body_part_to_score[bodyPart]
-    //         let uncheckedBoxField = SYMPTOM_TO_BODY_PART_MAP[box][bodyPart]
-    //         let topItem = bodyPartObject.paired_stack.peek()
-    //         if(topItem.item == uncheckedBoxField){
-    //             bodyPartObject.paired_stack.pop()
-    //             if(bodyPartObject.paired_stack.isEmpty()){
-    //                 this.body_part_to_color[bodyPart] = this.getColor(0)
-    //                 d3.select("path#" + bodyPart).style('fill',this.body_part_to_color[bodyPart])
-    //                 continue;
-    //             }
-    //             let newTopItem = bodyPartObject.paired_stack.peek()
-    //             this.body_part_to_color[bodyPart] = this.getColor(newTopItem.score)
-    //             d3.select("path#" + bodyPart).style('fill',this.body_part_to_color[bodyPart])
-    //         } else {
-    //             bodyPartObject.paired_stack.removeByValue(uncheckedBoxField)
-    //         }
-    //     }
-    // }
+    handleUncheckedBox(symptom,field){
+        for(const bodyPart in SYMPTOM_TO_BODY_PART_MAP[symptom]){
+            let bodyPartObject = this.symptom_to_body_parts[symptom][bodyPart]
+            let uncheckedBoxFields = SYMPTOM_TO_BODY_PART_MAP[symptom][bodyPart]
+            if(!uncheckedBoxFields.includes(field)){
+                continue;
+            }
+            let topItem = bodyPartObject.paired_stack.peek()
+            if(topItem.item == field){
+                bodyPartObject.paired_stack.pop()
+                if(bodyPartObject.paired_stack.isEmpty()){
+                    bodyPartObject.color = bodyPartObject.getColor(0)
+                    d3.select("#svg-"+symptom).selectAll("path#" + bodyPart).style('fill',bodyPartObject.color)
+                    continue;
+                }
+                let newTopItem = bodyPartObject.paired_stack.peek()
+                bodyPartObject.color = bodyPartObject.getColor(newTopItem.score)
+                d3.select("#svg-"+symptom).selectAll("path#" + bodyPart).style('fill',bodyPartObject.color)
+            } else {
+                bodyPartObject.paired_stack.removeByValue(field)
+            }
+        }
+}
 
     // Modify the avatarUrl based on the selected gender
     handleTemplateChanged(event){
@@ -203,23 +207,7 @@ class BrainWalkRecord {
         }
     }
 
-    renderAvatarsWithNewTemplate(){
-
-    }
-
     renderAvatar(bodyPartData,newAvatarUrl,symptom){
-        // d3.select('#svg-' + symptom).remove();
-        // d3.select("div.svg-"+symptom).remove();
-        const select = d3.select('#'+symptom + "-menu");
-        const selectDiv = select.selectAll('div').data(SYMPTOM_TO_BRAINWALK_FIELDS_MAP[symptom]).enter().append('div')
-        selectDiv.append('input')
-            .attr('type', 'checkbox')
-            .attr('id', (i) => `checkbox-${i}`)
-            .attr('value', i);
-        selectDiv.append('label')
-            .attr('for', (i) => `checkbox-label-${i}`)
-            .text(d => d);
-
         var tooltip = d3.select("div.svg-"+symptom).append('div')
                 .attr('class', 'tooltip')
                 .style('position','absolute')
@@ -293,7 +281,24 @@ var inputs = document.getElementsByName('Gender')
 for(var i = 0; i < inputs.length; i++){
     inputs[i].addEventListener("change", brainWalkRecord.handleTemplateChanged);
 }
-
+for(var symptom in SYMPTOM_TO_BRAINWALK_FIELDS_MAP){
+    var container = document.querySelector("#" + symptom + "-menu")
+    for(var field of SYMPTOM_TO_BRAINWALK_FIELDS_MAP[symptom]){
+        var optionContainer = document.createElement('div')
+        var input = document.createElement('input')
+        input.setAttribute('checked',true)
+        input.setAttribute('type','checkbox')
+        input.setAttribute('symptom',symptom)
+        input.setAttribute('field',field)
+        input.addEventListener("change",brainWalkRecord.handleCheckbox)
+        optionContainer.appendChild(input)
+        var label = document.createElement('label')
+        label.textContent = field
+        optionContainer.appendChild(label)
+        container.appendChild(optionContainer)
+    }
+}
+var checkboxes = document.getElementById("")
 // var buttons = document.getElementsByTagName("button");
 // for(var i = 0; i < buttons.length; i++){
 //     buttons[i].addEventListener("click", brainWalkRecord.handleTemplateChanged);
