@@ -115,6 +115,11 @@
             flex: 1;
             position: relative;
         }
+        .svg-cerebral {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
 
     </style>
 </head>
@@ -123,6 +128,7 @@
     <div class="top-bar">
     <h3>BrainWalk Data Avatar Visualizer</h3>
     <div class="dropdown-container">
+        {% if renderType == "body" %}
         <select name="Gender" id="Gender">
             <option>Gender</option>
             <option>Neutral</option>
@@ -145,10 +151,16 @@
             <button class="dropdown-toggle">Sensation</button>
             <div class="dropdown-menu" id="sensation-menu"></div>
         </div>
-
+        {% else %}
+        <div class="dropdown" id="cerebral-options">
+            <button class="dropdown-toggle">Cerebral</button>
+            <div class="dropdown-menu" id="cerebral-menu"></div>
+        </div>
+        {% endif %}
     </div>
     </div>
     <div class="svg-container">
+        {% if renderType == "body" %}
         <div class="svg-bowel-bladder">
             <h1>Bowel/Bladder</h1>
         </div>
@@ -161,10 +173,21 @@
         <div class="svg-sensation">
             <h1>Sensation</h1>
         </div>
+        {% else %}
+        <div class="svg-cerebral">
+            <h1>Cerebral</h1>
+        </div>
+        {% endif %}
     </div>
-    <script>
+    <script type="text/javascript">
+        var diagramType = "{{ renderType }}";
         var surveyDataMap = {{ data | tojson }};
-        var avatarUrl = "{{ url_for('static', filename='avatar_template/neutral.svg') }}"
+        var avatarUrl;
+        if(diagramType == "body"){
+            avatarUrl = "{{ url_for('static', filename='avatar_template/neutral.svg') }}"
+        } else {
+            avatarUrl = "{{ url_for('static', filename='avatar_template/head.svg') }}"
+        }
     </script>
     <script type="module" src="{{ url_for('static', filename='js/render_avatar.js') }}" ></script>
     {% else %}

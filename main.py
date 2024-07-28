@@ -11,12 +11,27 @@ app = Flask(__name__)
 
 @app.route('/')
 def main():
+    return
+
+@app.route('/bodyDiagram')
+def renderBodySymptoms():
     patientId = request.args.get('patientId')
+    diagramType = "body"
     if patientId != None:
         response = requests.get('http://localhost:5000/getPatientData/' + patientId)
         jsonResponse = response.json()
-        return render_template('index.html',patientId=patientId,data=jsonResponse)
-    return render_template('index.html',patientId=patientId,data={})
+        return render_template('index.html',patientId=patientId,data=jsonResponse,renderType=diagramType)
+    return render_template('index.html',patientId=patientId,data={},renderType=diagramType)
+
+@app.route('/headDiagram')
+def renderHeadData():
+    patientId = request.args.get('patientId')
+    diagramType = "cerebral"
+    if patientId != None:
+        response = requests.get('http://localhost:5000/getPatientData/' + patientId)
+        jsonResponse = response.json()
+        return render_template('index.html',patientId=patientId,data=jsonResponse,renderType=diagramType)
+    return render_template('index.html',patientId=patientId,data={},renderType=diagramType)
     
 @app.route('/getPatientData/<string:patientId>', methods=['GET'])
 def getPatientData(patientId):

@@ -5,25 +5,23 @@ const BODY_PART_TO_BRAINWALK_FIELDS = {"arm_right":["feeling_right_arm","strengt
         "face_right":["weakness_rt_face","feeling_rt"],
         "face_left":["weakness_lt_face","feeling_lt"],
         "abdomen":["bowel_bladder_max","bladder_urgency_change"],
-        "brain": ["cognition","fatigue"],
-        "torso":[],
-        "neck":["swallow","speak"],
-        "eye_right":["vision_rt"],
-        "eye_left":["vision_lt"],
-        "ear_left":["hearing"],
-        "ear_right":["hearing"]};
+        "torso":[]};
 const SYMPTOM_TO_BODY_PART_MAP = {
 "bowel-bladder" : {"abdomen":["bowel_bladder_max","bladder_urgency_change"]},
 "tremor": {"arm_right": ["tremor_arms"],"arm_left":["tremor_arms"],"leg_right": ["tremor_legs"],"leg_left":["tremor_legs"]},
 "strength": {"arm_right": ["strength_rt_arm"],"arm_left":["strength_lt_arm"],"leg_right": ["strength_rt_leg"],"leg_left":["strength_lt_leg"]},
 "sensation": {"arm_right": ["feeling_right_arm"],"arm_left":["feeling_left_arm"],"leg_right": ["feeling_right_leg"],"leg_left":["feeling_left_leg"],"face_right":["feeling_rt"],"face_left":["feeling_lt"]},
+"cerebral": {"neck":["swallow","speak"],"eye_right":["vision_rt"],"eye_left":["vision_lt"],"ear_left":["hearing"],"ear_right":["hearing"],"brain": ["cognition","fatigue"],"face_right":["weakness_rt_face","feeling_rt"],"face_left":["weakness_lt_face","feeling_lt"]},
 };
 const SYMPTOM_TO_BRAINWALK_FIELDS_MAP = {
     "bowel-bladder" : ["bowel_bladder_max","bladder_urgency_change"],
     "tremor": ["tremor_arms","tremor_legs"],
     "strength": ["strength_rt_arm","strength_lt_arm","strength_rt_leg","strength_lt_leg"],
     "sensation": ["feeling_right_arm","feeling_left_arm","feeling_right_leg","feeling_left_leg","feeling_rt","feeling_lt"],
-    };
+    "cerebral": ["swallow","speak","vision_rt","vision_lt","hearing","cognition","fatigue","weakness_rt_face","feeling_rt","weakness_lt_face","feeling_lt"]
+};
+const DIAGRAM_TYPE_CEREBRAL = "cerebral";
+const DIAGRAM_TYPE_BODY = "body";
 
 class PairedStack {
     constructor() {
@@ -111,21 +109,28 @@ class BodyPart {
 // per svg, we can drill down to specific fields that concern that symptom category
 //
 class BrainWalkRecord {
-    constructor(surveyDataMap){
+    constructor(surveyDataMap,diagramType){
         this.survey_data_map = surveyDataMap;
-        // could change this to map to symptoms, one symptom per graph
-        // symptom -> {name -> body part data}
-        this.symptom_to_body_parts = {"bowel-bladder":{},"tremor":{},"strength":{},"sensation":{}};
-        this.initializeBodyPartMap();
         // this.handleTemplateChanged = this.handleTemplateChanged.bind(this)
         this.handleCheckbox = this.handleCheckbox.bind(this)
         this.handleCheckedBox = this.handleCheckedBox.bind(this)
         this.handleUncheckedBox = this.handleUncheckedBox.bind(this)
-        this.renderAvatars(this.symptom_to_body_parts,avatarUrl)
+        // could change this to map to symptoms, one symptom per graph
+        // symptom -> {name -> body part data}
+        this.symptom_to_body_parts = {"bowel-bladder":{},"tremor":{},"strength":{},"sensation":{},"cerebral":{}};
+        this.initializeBodyPartMap();
+        if(diagramType == DIAGRAM_TYPE_BODY){
+            this.renderAvatars(this.symptom_to_body_parts,avatarUrl)
+        } else if(diagramType == DIAGRAM_TYPE_CEREBRAL) {
+            this.renderAvatar(this.symptom_to_body_parts[DIAGRAM_TYPE_CEREBRAL],avatarUrl,DIAGRAM_TYPE_CEREBRAL)
+        }
     }
 
     initializeBodyPartMap(){
         for(const symptom in SYMPTOM_TO_BODY_PART_MAP){
+            if((diagramType == DIAGRAM_TYPE_CEREBRAL && symptom != "cerebral") || (diagramType == DIAGRAM_TYPE_BODY && symptom == "cerebral")){
+                continue;
+            }
             for(const bodyPart in SYMPTOM_TO_BODY_PART_MAP[symptom]){
                 let bodyPartData = new BodyPart(bodyPart,symptom)
                 this.symptom_to_body_parts[symptom][bodyPart] = bodyPartData
@@ -258,7 +263,7 @@ class BrainWalkRecord {
                     + "<div>" + brainWalkObject.score + "</div>";
                 }
                 if(formattedHtml == ""){
-                    formattedHtml = "<div>No issues with " + id + "!</div>"
+                    formattedHtml = "<div>No data for " + id + "!</div>"
                 }
                 tooltip.html(formattedHtml)
                 .transition()
@@ -274,7 +279,7 @@ class BrainWalkRecord {
     }
 }
 
-let brainWalkRecord = new BrainWalkRecord(surveyDataMap)
+let brainWalkRecord = new BrainWalkRecord(surveyDataMap,diagramType)
 
 // // Add event listeners for dropdowns
 var inputs = document.getElementsByName('Gender')
@@ -282,6 +287,9 @@ for(var i = 0; i < inputs.length; i++){
     inputs[i].addEventListener("change", brainWalkRecord.handleTemplateChanged);
 }
 for(var symptom in SYMPTOM_TO_BRAINWALK_FIELDS_MAP){
+    if((diagramType == DIAGRAM_TYPE_CEREBRAL && symptom != "cerebral") || (diagramType == DIAGRAM_TYPE_BODY && symptom == "cerebral")){
+        continue;
+    }
     var container = document.querySelector("#" + symptom + "-menu")
     for(var field of SYMPTOM_TO_BRAINWALK_FIELDS_MAP[symptom]){
         var optionContainer = document.createElement('div')
