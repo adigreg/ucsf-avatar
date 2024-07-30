@@ -20,8 +20,6 @@ const SYMPTOM_TO_BRAINWALK_FIELDS_MAP = {
     "sensation": ["feeling_right_arm","feeling_left_arm","feeling_right_leg","feeling_left_leg","feeling_rt","feeling_lt"],
     "cerebral": ["swallow","speak","vision_rt","vision_lt","hearing","cognition","fatigue","weakness_rt_face","feeling_rt","weakness_lt_face","feeling_lt"]
 };
-const DIAGRAM_TYPE_CEREBRAL = "cerebral";
-const DIAGRAM_TYPE_BODY = "body";
 
 class PairedStack {
     constructor() {
@@ -109,9 +107,9 @@ class BodyPart {
 // per svg, we can drill down to specific fields that concern that symptom category
 //
 class BrainWalkRecord {
-    constructor(surveyDataMap,diagramType){
+    constructor(surveyDataMap){
         this.survey_data_map = surveyDataMap;
-        // this.handleTemplateChanged = this.handleTemplateChanged.bind(this)
+        this.handleTemplateChanged = this.handleTemplateChanged.bind(this)
         this.handleCheckbox = this.handleCheckbox.bind(this)
         this.handleCheckedBox = this.handleCheckedBox.bind(this)
         this.handleUncheckedBox = this.handleUncheckedBox.bind(this)
@@ -119,18 +117,11 @@ class BrainWalkRecord {
         // symptom -> {name -> body part data}
         this.symptom_to_body_parts = {"bowel-bladder":{},"tremor":{},"strength":{},"sensation":{},"cerebral":{}};
         this.initializeBodyPartMap();
-        if(diagramType == DIAGRAM_TYPE_BODY){
-            this.renderAvatars(this.symptom_to_body_parts,avatarUrl)
-        } else if(diagramType == DIAGRAM_TYPE_CEREBRAL) {
-            this.renderAvatar(this.symptom_to_body_parts[DIAGRAM_TYPE_CEREBRAL],avatarUrl,DIAGRAM_TYPE_CEREBRAL)
-        }
+        this.renderAvatars(this.symptom_to_body_parts,avatarUrl)
     }
 
     initializeBodyPartMap(){
         for(const symptom in SYMPTOM_TO_BODY_PART_MAP){
-            if((diagramType == DIAGRAM_TYPE_CEREBRAL && symptom != "cerebral") || (diagramType == DIAGRAM_TYPE_BODY && symptom == "cerebral")){
-                continue;
-            }
             for(const bodyPart in SYMPTOM_TO_BODY_PART_MAP[symptom]){
                 let bodyPartData = new BodyPart(bodyPart,symptom)
                 this.symptom_to_body_parts[symptom][bodyPart] = bodyPartData
@@ -194,6 +185,7 @@ class BrainWalkRecord {
 
     // Modify the avatarUrl based on the selected gender
     handleTemplateChanged(event){
+        console.log(event)
         let gender = event.target.id
         if (gender === 'male') {
             avatarUrl = "static/avatar_template/male.svg";
@@ -207,8 +199,17 @@ class BrainWalkRecord {
     }
 
     renderAvatars(symptomToBodyPartData,newAvatarUrl){
+        d3.selectAll('svg').remove();
+        var avatarPath = newAvatarUrl;
         for(const symptom in SYMPTOM_TO_BODY_PART_MAP){
-            this.renderAvatar(symptomToBodyPartData[symptom],newAvatarUrl,symptom)
+            if(symptom == "cerebral"){
+                avatarPath = headUrl
+            } else if(symptom == "bowel-bladder"){
+                avatarPath = abdomenUrl
+            } else {
+                avatarPath = newAvatarUrl
+            }
+            this.renderAvatar(symptomToBodyPartData[symptom],avatarPath,symptom)
         }
     }
 
@@ -256,11 +257,13 @@ class BrainWalkRecord {
                 var pathElement = d3.select(this);
                 var id = pathElement.attr('id');
                 var formattedHtml = ""
-                for(let i = bodyPartData[id].paired_stack.size() - 1; i >= 0; i--){
-                    let brainWalkObject = bodyPartData[id].paired_stack.stack[i];
-                    formattedHtml += 
-                    "<div><strong>" + brainWalkObject.item + "</strong>" + "</div>"
-                    + "<div>" + brainWalkObject.score + "</div>";
+                if(id in bodyPartData){
+                    for(let i = bodyPartData[id].paired_stack.size() - 1; i >= 0; i--){
+                        let brainWalkObject = bodyPartData[id].paired_stack.stack[i];
+                        formattedHtml += 
+                        "<div><strong>" + brainWalkObject.item + "</strong>" + "</div>"
+                        + "<div>" + brainWalkObject.score + "</div>";
+                    }
                 }
                 if(formattedHtml == ""){
                     formattedHtml = "<div>No data for " + id + "!</div>"
@@ -279,17 +282,14 @@ class BrainWalkRecord {
     }
 }
 
-let brainWalkRecord = new BrainWalkRecord(surveyDataMap,diagramType)
+let brainWalkRecord = new BrainWalkRecord(surveyDataMap)
 
 // // Add event listeners for dropdowns
-var inputs = document.getElementsByName('Gender')
+var inputs = document.getElementsByName('genderOption')
 for(var i = 0; i < inputs.length; i++){
-    inputs[i].addEventListener("change", brainWalkRecord.handleTemplateChanged);
+    inputs[i].addEventListener("click", brainWalkRecord.handleTemplateChanged);
 }
 for(var symptom in SYMPTOM_TO_BRAINWALK_FIELDS_MAP){
-    if((diagramType == DIAGRAM_TYPE_CEREBRAL && symptom != "cerebral") || (diagramType == DIAGRAM_TYPE_BODY && symptom == "cerebral")){
-        continue;
-    }
     var container = document.querySelector("#" + symptom + "-menu")
     for(var field of SYMPTOM_TO_BRAINWALK_FIELDS_MAP[symptom]){
         var optionContainer = document.createElement('div')
@@ -307,7 +307,3 @@ for(var symptom in SYMPTOM_TO_BRAINWALK_FIELDS_MAP){
     }
 }
 var checkboxes = document.getElementById("")
-// var buttons = document.getElementsByTagName("button");
-// for(var i = 0; i < buttons.length; i++){
-//     buttons[i].addEventListener("click", brainWalkRecord.handleTemplateChanged);
-// }

@@ -111,15 +111,27 @@
             padding-top: 80px;
         }
 
-        .svg-tremor, .svg-strength, .svg-sensation, .svg-bowel-bladder {
+        .svg-tremor, .svg-strength, .svg-sensation {
             flex: 1;
             position: relative;
         }
-        .svg-cerebral {
-            position: absolute;
-            width: 100%;
-            height: 100%;
+
+        .svg-extras {
+            flex: 1;
+            position: relative;
         }
+
+        .svg-cerebral {
+            padding-left: 60px;
+            position: relative;
+        }
+
+        .svg-bowel-bladder {
+            padding-top: 100px;
+            padding-left: 60px;
+            position: relative;
+        }
+
 
     </style>
 </head>
@@ -128,13 +140,16 @@
     <div class="top-bar">
     <h3>BrainWalk Data Avatar Visualizer</h3>
     <div class="dropdown-container">
-        {% if renderType == "body" %}
         <select name="Gender" id="Gender">
             <option>Gender</option>
-            <option>Neutral</option>
-            <option>Female</option>
-            <option>Male</option>
+            <option name="genderOption" id="neutral">Neutral</option>
+            <option name="genderOption" id="female">Female</option>
+            <option name="genderOption" id="male">Male</option>
         </select>
+        <div class="dropdown" id="cerebral-options">
+            <button class="dropdown-toggle">Cerebral</button>
+            <div class="dropdown-menu" id="cerebral-menu"></div>
+        </div>
         <div class="dropdown" id="bowel-bladder-options">
             <button class="dropdown-toggle">Bowel/Bladder</button>
             <div class="dropdown-menu" id="bowel-bladder-menu"></div>
@@ -151,18 +166,16 @@
             <button class="dropdown-toggle">Sensation</button>
             <div class="dropdown-menu" id="sensation-menu"></div>
         </div>
-        {% else %}
-        <div class="dropdown" id="cerebral-options">
-            <button class="dropdown-toggle">Cerebral</button>
-            <div class="dropdown-menu" id="cerebral-menu"></div>
-        </div>
-        {% endif %}
     </div>
     </div>
     <div class="svg-container">
-        {% if renderType == "body" %}
-        <div class="svg-bowel-bladder">
-            <h1>Bowel/Bladder</h1>
+        <div class="svg-extras">
+            <div class="svg-cerebral">
+                <h1>Cerebral</h1>
+            </div>
+            <div class="svg-bowel-bladder">
+                <h1>Bowel/Bladder</h1>
+            </div>
         </div>
         <div class="svg-tremor">
             <h1>Tremor</h1>
@@ -173,21 +186,12 @@
         <div class="svg-sensation">
             <h1>Sensation</h1>
         </div>
-        {% else %}
-        <div class="svg-cerebral">
-            <h1>Cerebral</h1>
-        </div>
-        {% endif %}
     </div>
     <script type="text/javascript">
-        var diagramType = "{{ renderType }}";
         var surveyDataMap = {{ data | tojson }};
-        var avatarUrl;
-        if(diagramType == "body"){
-            avatarUrl = "{{ url_for('static', filename='avatar_template/neutral.svg') }}"
-        } else {
-            avatarUrl = "{{ url_for('static', filename='avatar_template/head.svg') }}"
-        }
+        var avatarUrl = "{{ url_for('static', filename='avatar_template/neutral.svg') }}";
+        var headUrl = "{{ url_for('static', filename='avatar_template/head.svg') }}";
+        var abdomenUrl = "{{ url_for('static', filename='avatar_template/abdomen.svg') }}";
     </script>
     <script type="module" src="{{ url_for('static', filename='js/render_avatar.js') }}" ></script>
     {% else %}
