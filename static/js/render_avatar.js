@@ -1,11 +1,3 @@
-const BODY_PART_TO_BRAINWALK_FIELDS = {"arm_right":["feeling_right_arm","strength_rt_arm","spasm_rt_arm","tremor_arms"],
-        "arm_left":["feeling_left_arm","strength_lt_arm","spasm_lt_arm","tremor_arms"],
-        "leg_right":["feeling_right_leg","strength_rt_leg","spasm_rt_leg","tremor_legs"],
-        "leg_left": ["feeling_left_leg","strength_lt_leg","spasm_lt_leg","tremor_legs"],
-        "face_right":["weakness_rt_face","feeling_rt"],
-        "face_left":["weakness_lt_face","feeling_lt"],
-        "abdomen":["bowel_bladder_max","bladder_urgency_change"],
-        "torso":[]};
 const SYMPTOM_TO_BODY_PART_MAP = {
 "bowel-bladder" : {"abdomen":["bowel_bladder_max","bladder_urgency_change"]},
 "tremor": {"arm_right": ["tremor_arms"],"arm_left":["tremor_arms"],"leg_right": ["tremor_legs"],"leg_left":["tremor_legs"]},
