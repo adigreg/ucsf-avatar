@@ -32,10 +32,6 @@
             z-index: 1000; /* Ensure the top bar is above other elements */
         }
 
-        h1 {
-            text-align: center;
-        }
-
         h3 {
             align-self: first baseline;
             display: flex;
@@ -45,23 +41,24 @@
         }
 
         .dropdown-container {
-            align-self: flex-end;
+            align-items: center;
             display: flex;
-            margin-bottom: 10px;
-            margin-top: 10px;
-            margin-left: 10px;
         }
 
-        select {
+        .dropdown-toggle, select {
             position: relative;
             display: inline-block;
-            background-color: #3498db;
-            color: white;
+            background-color: white;
+            color: black;
             padding: 10px;
             font-size: 16px;
-            border: none;
+            border: black;
             cursor: pointer;
             margin-right: 30px;
+            text-align: center;
+            border-color: black;
+            border-style: solid;
+            border-radius: 36px;
         }
 
         
@@ -71,15 +68,6 @@
             margin-right: 30px;
         }
 
-        .dropdown-toggle {
-            background-color: #3498db;
-            color: white;
-            padding: 10px;
-            font-size: 16px;
-            border: none;
-            cursor: pointer;
-        }
-
         .dropdown-menu {
             display: none;
             position: absolute;
@@ -87,6 +75,7 @@
             min-width: 160px;
             box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
             z-index: 1;
+            right: 0;
         }
 
         .dropdown-menu div {
@@ -109,27 +98,26 @@
         .svg-container {
             display: flex;
             padding-top: 80px;
+            height: auto;
         }
 
-        .svg-tremor, .svg-strength, .svg-sensation {
+        .svg-column {
             flex: 1;
             position: relative;
         }
 
-        .svg-extras {
-            flex: 1;
-            position: relative;
-        }
-
-        .svg-cerebral {
-            padding-left: 60px;
-            position: relative;
+        .svg-column h2 {
+            text-align: center;
         }
 
         .svg-bowel-bladder {
-            padding-top: 100px;
-            padding-left: 60px;
             position: relative;
+            padding-top: 100px;
+        }
+
+        svg {
+            display: block;
+            margin: auto;
         }
 
 
@@ -140,51 +128,62 @@
     <div class="top-bar">
     <h3>BrainWalk Data Avatar Visualizer</h3>
     <div class="dropdown-container">
-        <select name="Gender" id="Gender">
-            <option>Gender</option>
-            <option name="genderOption" id="neutral">Neutral</option>
-            <option name="genderOption" id="female">Female</option>
-            <option name="genderOption" id="male">Male</option>
-        </select>
+        <div class="dropdown" id="gender">
+            <button class="dropdown-toggle">Gender<strong>&nbsp;&nbsp;&or;</strong></button>
+            <div class="dropdown-menu" id="gender-menu">
+                <div>
+                    <input id="neutral" type="radio" name="genderOption" checked></input>
+                    <label>Neutral</label>
+                </div>
+                <div>
+                    <input id="female" type="radio" name="genderOption"></input>
+                    <label>Female</label>
+                </div>
+                <div>
+                    <input id="male" type="radio" name="genderOption"></input>
+                    <label>Male</label>
+                </div>
+            </div>
+        </div>
         <div class="dropdown" id="cerebral-options">
-            <button class="dropdown-toggle">Cerebral</button>
+            <button class="dropdown-toggle">Cerebral<strong>&nbsp;&nbsp;&or;</strong></button>
             <div class="dropdown-menu" id="cerebral-menu"></div>
         </div>
         <div class="dropdown" id="bowel-bladder-options">
-            <button class="dropdown-toggle">Bowel/Bladder</button>
+            <button class="dropdown-toggle">Bowel/Bladder<strong>&nbsp;&nbsp;&or;</strong></button>
             <div class="dropdown-menu" id="bowel-bladder-menu"></div>
         </div>
         <div class="dropdown" id="tremor-options">
-            <button class="dropdown-toggle">Tremor</button>
+            <button class="dropdown-toggle">Tremor<strong>&nbsp;&nbsp;&or;</strong></button>
             <div class="dropdown-menu" id="tremor-menu"></div>
         </div>
         <div class="dropdown" id="strength-options">
-            <button class="dropdown-toggle">Strength</button>
+            <button class="dropdown-toggle">Strength<strong>&nbsp;&nbsp;&or;</strong></button>
             <div class="dropdown-menu" id="strength-menu"></div>
         </div>
         <div class="dropdown" id="sensation-options">
-            <button class="dropdown-toggle">Sensation</button>
+            <button class="dropdown-toggle">Sensation<strong>&nbsp;&nbsp;&or;</strong></button>
             <div class="dropdown-menu" id="sensation-menu"></div>
         </div>
     </div>
     </div>
     <div class="svg-container">
-        <div class="svg-extras">
+        <div class="svg-column svg-extras">
             <div class="svg-cerebral">
-                <h1>Cerebral</h1>
+                <h2>Cerebral</h2>
             </div>
             <div class="svg-bowel-bladder">
-                <h1>Bowel/Bladder</h1>
+                <h2>Bowel/Bladder</h2>
             </div>
         </div>
-        <div class="svg-tremor">
-            <h1>Tremor</h1>
+        <div class="svg-column svg-tremor">
+            <h2>Tremor</h2>
         </div>
-        <div class="svg-strength">
-            <h1>Strength</h1>
+        <div class="svg-column svg-strength">
+            <h2>Strength</h2>
         </div>
-        <div class="svg-sensation">
-            <h1>Sensation</h1>
+        <div class="svg-column svg-sensation">
+            <h2>Sensation</h2>
         </div>
     </div>
     <script type="text/javascript">
@@ -195,7 +194,7 @@
     </script>
     <script type="module" src="{{ url_for('static', filename='js/render_avatar.js') }}" ></script>
     {% else %}
-        <h1>No patient found. Please provide a valid patient ID.</h1>
+        <h2>No patient found. Please provide a valid patient ID.</h2>
     {% endif %}
     </body>
 </html>

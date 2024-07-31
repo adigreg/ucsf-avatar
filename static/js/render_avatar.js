@@ -185,7 +185,6 @@ class BrainWalkRecord {
 
     // Modify the avatarUrl based on the selected gender
     handleTemplateChanged(event){
-        console.log(event)
         let gender = event.target.id
         if (gender === 'male') {
             avatarUrl = "static/avatar_template/male.svg";
