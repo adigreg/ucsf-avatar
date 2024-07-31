@@ -223,6 +223,7 @@ class BrainWalkRecord {
                 .style("border", "solid")
                 .style("border-width", "2px")
                 .style("border-radius", "5px")
+                .style("pointer-events",'none')
                 .style("padding", "5px");
         d3.xml(newAvatarUrl).then(function(xml) {
             var svgElement = xml.documentElement;
